@@ -1,0 +1,38 @@
+/* React-only additions on top of the ported global.css.
+   Everything here exists because a markup element changed type
+   (nav buttons became <a>) or because a screen is new (login). */
+
+/* Sidebar items are <NavLink> anchors now, not <button>. */
+a.nav-item {
+  text-decoration: none;
+  font: inherit;
+}
+a.nav-item > span:first-of-type {
+  flex: 1;
+  text-align: left;
+}
+
+/* The avatar picker renders a bare <svg>, no wrapper span. */
+.av-opt > svg {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+/* Shown while GET /api/auth/me decides whether we are signed in. */
+.boot-splash {
+  min-height: 100vh;
+  min-height: 100dvh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  color: var(--text-muted);
+  background: var(--bg);
+}
+
+/* The brand mark is a transparent PNG, so it needs the white tile behind it
+   and a little padding — otherwise the sunburst rays touch the edges. */
+.brand-tile img {
+  padding: 3px;
+}

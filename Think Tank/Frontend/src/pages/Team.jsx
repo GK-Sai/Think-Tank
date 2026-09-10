@@ -1,0 +1,220 @@
+import { useEffect, useMemo, useState } from 'react';
+import InviteMemberModal from '../components/team/InviteMemberModal';
+import EditRoleModal from '../components/team/EditRoleModal';
+import ConfirmDialog from '../components/ui/ConfirmDialog';
+import BackLink from '../components/layout/BackLink';
+import { IdeaPager } from '../components/ui/Pager';
+import { MemberAvatar } from '../lib/avatars';
+import { displayName } from '../lib/format';
+import { PlusIcon, SearchIcon, CloseIcon, ChevronDownIcon } from '../lib/icons';
+import { ALL_DEPARTMENTS } from '../data/seed';
+import { useApp } from '../store/AppContext';
+import { useAuth } from '../store/AuthContext';
+import { useToast } from '../store/ToastContext';
+
+const PER_PAGE = 8;
+const BLANK = { query: '', dept: '', role: '', sort: 'name' };
+
+export default function Team() {
+  const { team, addMember, updateMember, removeMember } = useApp();
+  const { user, isChair } = useAuth();
+  const toast = useToast();
+
+  const [inviteOpen, setInviteOpen] = useState(false);
+  const [editing, setEditing] = useState(null);
+  const [removing, setRemoving] = useState(null);
+  const [f, setF] = useState(BLANK);
+  const [page, setPage] = useState(1);
+  /* Phone only: the search field is folded away behind the icon at the right
+     of the heading, and opens on that same line rather than pushing the
+     filters down a row. The desktop field in the filter bar is untouched. */
+  const [searchOpen, setSearchOpen] = useState(false);
+
+  const set = (key, value) => setF((prev) => ({ ...prev, [key]: value }));
+  useEffect(() => { setPage(1); }, [f]);
+
+  /* Job titles come from the data, not a fixed list, so a title invented
+     when someone is added is filterable straight away. */
+  const roles = useMemo(
+    () => Array.from(new Set(team.map((m) => m.role).filter(Boolean))).sort(),
+    [team]
+  );
+
+  const rows = useMemo(() => {
+    const q = f.query.trim().toLowerCase();
+    const matched = team.filter((m) => {
+      if (f.dept && m.dept !== f.dept) return false;
+      if (f.role && m.role !== f.role) return false;
+      if (!q) return true;
+      return `${m.name} ${m.dept} ${m.role} ${m.email}`.toLowerCase().includes(q);
+    });
+
+    const sorters = {
+      name: (a, b) => a.name.localeCompare(b.name),
+      dept: (a, b) => a.dept.localeCompare(b.dept) || a.name.localeCompare(b.name),
+      role: (a, b) => a.role.localeCompare(b.role) || a.name.localeCompare(b.name),
+    };
+    return matched.sort(sorters[f.sort] || sorters.name);
+  }, [team, f]);
+
+  const pages = Math.max(1, Math.ceil(rows.length / PER_PAGE));
+  const current = Math.min(page, pages);
+  const slice = rows.slice((current - 1) * PER_PAGE, current * PER_PAGE);
+
+  return (
+    <>
+      <BackLink to="/" label="Back to Dashboard" />
+
+      <div className={`sec-head${searchOpen ? ' searching' : ''}`}>
+        <div className="sh-txt">
+          <h2>Team Members</h2>
+          <p>
+            {rows.length} member{rows.length === 1 ? '' : 's'}
+            {rows.length !== team.length && ` of ${team.length}`}
+          </p>
+        </div>
+
+        {/* The field itself, on the heading's own line. */}
+        {searchOpen && (
+          <div className="search-box head-search">
+            <SearchIcon />
+            <input
+              type="search"
+              autoFocus
+              placeholder="Search team members"
+              aria-label="Search team members"
+              value={f.query}
+              onChange={(e) => set('query', e.target.value)}
+              onKeyDown={(e) => { if (e.key === 'Escape') { set('query', ''); setSearchOpen(false); } }}
+            />
+          </div>
+        )}
+
+        {isChair && (
+          <button className="btn-add" onClick={() => setInviteOpen(true)}>
+            <PlusIcon />
+            Add Member
+          </button>
+        )}
+
+        <button
+          type="button"
+          className={`hs-btn${searchOpen ? ' on' : ''}`}
+          aria-label={searchOpen ? 'Close search' : 'Search team members'}
+          aria-expanded={searchOpen}
+          onClick={() => {
+            if (searchOpen) set('query', '');
+            setSearchOpen((v) => !v);
+          }}
+        >
+          {searchOpen ? <CloseIcon /> : <SearchIcon />}
+        </button>
+      </div>
+
+      <div className="idea-filters">
+        <div className="search-box">
+          <SearchIcon />
+          <input
+            type="search"
+            placeholder="Search by name, email or role"
+            aria-label="Search team members"
+            value={f.query}
+            onChange={(e) => set('query', e.target.value)}
+          />
+        </div>
+
+        <div className="select-box">
+          <select aria-label="Filter by department" value={f.dept} onChange={(e) => set('dept', e.target.value)}>
+            <option value="">All Departments</option>
+            {ALL_DEPARTMENTS.map((d) => <option key={d} value={d}>{d}</option>)}
+          </select>
+          <ChevronDownIcon />
+        </div>
+
+        <div className="select-box">
+          <select aria-label="Filter by role" value={f.role} onChange={(e) => set('role', e.target.value)}>
+            <option value="">All Roles</option>
+            {roles.map((r) => <option key={r} value={r}>{r}</option>)}
+          </select>
+          <ChevronDownIcon />
+        </div>
+
+        <div className="select-box wide">
+          <select aria-label="Sort team members" value={f.sort} onChange={(e) => set('sort', e.target.value)}>
+            <option value="name">Name A–Z</option>
+            <option value="dept">Department A–Z</option>
+            <option value="role">Role A–Z</option>
+          </select>
+          <ChevronDownIcon />
+        </div>
+      </div>
+
+      <p className="swipe-hint">Swipe the table sideways to see all columns</p>
+      <div className="bt-wrap">
+        {/* On a phone each member becomes a card: the face and the name on one
+            line, everything else labelled underneath. */}
+        <table className="bluetable stacks team-tbl">
+          <thead>
+            <tr>
+              <th style={{ width: 76 }}>Member</th>
+              <th>Name</th>
+              <th>Department</th>
+              <th>Role</th>
+              {isChair && <th style={{ width: 170 }}>Action</th>}
+            </tr>
+          </thead>
+          <tbody>
+            {slice.map((m) => (
+              <tr key={m.id}>
+                <td className="t-face"><MemberAvatar member={m} /></td>
+                <td className="t-name">
+                  {displayName(m.name, m.accountRole)}
+                  {m.id === user?.id && <span className="muted"> (you)</span>}
+                </td>
+                <td className="muted" data-label="Department">{m.dept}</td>
+                <td data-label="Role"><span className="pill role">{m.role}</span></td>
+                {isChair && (
+                  /* Not on your own row: the chairman has no department or
+                     job title to edit, and Remove refuses your own account —
+                     the button could only ever have failed. */
+                  <td className="row-act td-act">
+                    {m.id !== user?.id && (
+                      <>
+                        <button className="edit" onClick={() => setEditing(m)}>Edit Role</button>
+                        <span className="sep">|</span>
+                        <button className="rm" onClick={() => setRemoving(m)}>Remove</button>
+                      </>
+                    )}
+                  </td>
+                )}
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+      {slice.length === 0 && <div className="empty">No members match your filters.</div>}
+
+      <IdeaPager page={current} pages={pages} onChange={setPage} />
+
+      <InviteMemberModal open={inviteOpen} onClose={() => setInviteOpen(false)} onAdd={addMember} />
+      <EditRoleModal member={editing} onClose={() => setEditing(null)} onSave={updateMember} />
+
+      <ConfirmDialog
+        open={!!removing}
+        title={`Remove ${displayName(removing?.name, removing?.accountRole)}?`}
+        body="They will lose access to the workspace immediately."
+        okLabel="Remove"
+        onCancel={() => setRemoving(null)}
+        onConfirm={async () => {
+          const name = displayName(removing.name, removing.accountRole);
+          try {
+            await removeMember(removing.id);
+            toast(`${name} removed`);
+          } finally {
+            setRemoving(null);
+          }
+        }}
+      />
+    </>
+  );
+}
