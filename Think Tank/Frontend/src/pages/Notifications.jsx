@@ -1,6 +1,7 @@
 import { useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import BackLink from '../components/layout/BackLink';
+import Select from '../components/ui/Select';
 import { useApp } from '../store/AppContext';
 import { useToast } from '../store/ToastContext';
 import { bucketOf, fmtWhen, fmtDateTime, toDate } from '../lib/date';
@@ -162,19 +163,19 @@ export default function Notifications() {
           />
         </div>
 
-        <div className="select-box">
-          <select aria-label="Filter by type" value={kind} onChange={(e) => setKind(e.target.value)}>
-            {KINDS.map(([v, l]) => <option key={v} value={v}>{l}</option>)}
-          </select>
-          <ChevronDownIcon />
-        </div>
+        <Select
+          label="Filter by type"
+          value={kind}
+          onChange={setKind}
+          options={KINDS.map(([v, l]) => ({ value: v, label: l }))}
+        />
 
-        <div className="select-box">
-          <select aria-label="Filter by when" value={when} onChange={(e) => setWhen(e.target.value)}>
-            {WHEN.map(([v, l]) => <option key={v} value={v}>{l}</option>)}
-          </select>
-          <ChevronDownIcon />
-        </div>
+        <Select
+          label="Filter by when"
+          value={when}
+          onChange={setWhen}
+          options={WHEN.map(([v, l]) => ({ value: v, label: l }))}
+        />
       </div>
 
       <div className="tl-card" style={{ marginTop: 12 }}>

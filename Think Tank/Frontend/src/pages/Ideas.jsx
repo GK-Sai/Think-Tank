@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import PageHead from '../components/layout/PageHead';
 import BackLink from '../components/layout/BackLink';
+import Select from '../components/ui/Select';
 import { IdeaPager } from '../components/ui/Pager';
 import { useApp } from '../store/AppContext';
 import { useAuth } from '../store/AuthContext';
@@ -140,43 +141,40 @@ export default function Ideas() {
           />
         </div>
 
-        <div className="select-box">
-          <select aria-label="Filter by department" value={f.dept} onChange={(e) => set('dept', e.target.value)}>
-            <option value="">All Departments</option>
-            {DEPARTMENTS.map((d) => <option key={d} value={d}>{d}</option>)}
-          </select>
-          <ChevronDownIcon />
-        </div>
+        <Select
+          label="Filter by department"
+          value={f.dept}
+          onChange={(v) => set('dept', v)}
+          options={[{ value: '', label: 'All Departments' }, ...DEPARTMENTS.map((d) => ({ value: d, label: d }))]}
+        />
 
-        <div className="select-box">
-          <select aria-label="Filter by status" value={f.status} onChange={(e) => set('status', e.target.value)}>
-            <option value="">All Statuses</option>
-            {STATUSES.map((s) => <option key={s} value={s}>{s}</option>)}
-          </select>
-          <ChevronDownIcon />
-        </div>
+        <Select
+          label="Filter by status"
+          value={f.status}
+          onChange={(v) => set('status', v)}
+          options={[{ value: '', label: 'All Statuses' }, ...STATUSES.map((x) => ({ value: x, label: x }))]}
+        />
 
-        <div className="select-box">
-          <select aria-label="Filter by category or tag" value={f.tag} onChange={(e) => set('tag', e.target.value)}>
-            <option value="">All Categories</option>
-            {tags.map((t) => <option key={t} value={t}>{t}</option>)}
-          </select>
-          <ChevronDownIcon />
-        </div>
+        <Select
+          label="Filter by category or tag"
+          value={f.tag}
+          onChange={(v) => set('tag', v)}
+          options={[{ value: '', label: 'All Categories' }, ...tags.map((t) => ({ value: t, label: t }))]}
+        />
 
-        <div className="select-box">
-          <select aria-label="Filter by date created" value={f.period} onChange={(e) => set('period', e.target.value)}>
-            {PERIODS.map(([v, l]) => <option key={v} value={v}>{l}</option>)}
-          </select>
-          <ChevronDownIcon />
-        </div>
+        <Select
+          label="Filter by date created"
+          value={f.period}
+          onChange={(v) => set('period', v)}
+          options={PERIODS.map(([v, l]) => ({ value: v, label: l }))}
+        />
 
-        <div className="select-box">
-          <select aria-label="Sort ideas" value={f.sort} onChange={(e) => set('sort', e.target.value)}>
-            {SORTS.map(([v, l]) => <option key={v} value={v}>{l}</option>)}
-          </select>
-          <ChevronDownIcon />
-        </div>
+        <Select
+          label="Sort ideas"
+          value={f.sort}
+          onChange={(v) => set('sort', v)}
+          options={SORTS.map(([v, l]) => ({ value: v, label: l }))}
+        />
       </div>
 
       <div className="card">

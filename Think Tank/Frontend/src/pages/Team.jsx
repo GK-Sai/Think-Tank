@@ -3,6 +3,7 @@ import InviteMemberModal from '../components/team/InviteMemberModal';
 import EditRoleModal from '../components/team/EditRoleModal';
 import ConfirmDialog from '../components/ui/ConfirmDialog';
 import BackLink from '../components/layout/BackLink';
+import Select from '../components/ui/Select';
 import { IdeaPager } from '../components/ui/Pager';
 import { MemberAvatar } from '../lib/avatars';
 import { displayName } from '../lib/format';
@@ -123,30 +124,31 @@ export default function Team() {
           />
         </div>
 
-        <div className="select-box">
-          <select aria-label="Filter by department" value={f.dept} onChange={(e) => set('dept', e.target.value)}>
-            <option value="">All Departments</option>
-            {ALL_DEPARTMENTS.map((d) => <option key={d} value={d}>{d}</option>)}
-          </select>
-          <ChevronDownIcon />
-        </div>
+        <Select
+          label="Filter by department"
+          value={f.dept}
+          onChange={(v) => set('dept', v)}
+          options={[{ value: '', label: 'All Departments' }, ...ALL_DEPARTMENTS.map((d) => ({ value: d, label: d }))]}
+        />
 
-        <div className="select-box">
-          <select aria-label="Filter by role" value={f.role} onChange={(e) => set('role', e.target.value)}>
-            <option value="">All Roles</option>
-            {roles.map((r) => <option key={r} value={r}>{r}</option>)}
-          </select>
-          <ChevronDownIcon />
-        </div>
+        <Select
+          label="Filter by role"
+          value={f.role}
+          onChange={(v) => set('role', v)}
+          options={[{ value: '', label: 'All Roles' }, ...roles.map((r) => ({ value: r, label: r }))]}
+        />
 
-        <div className="select-box wide">
-          <select aria-label="Sort team members" value={f.sort} onChange={(e) => set('sort', e.target.value)}>
-            <option value="name">Name A–Z</option>
-            <option value="dept">Department A–Z</option>
-            <option value="role">Role A–Z</option>
-          </select>
-          <ChevronDownIcon />
-        </div>
+        <Select
+          className="wide"
+          label="Sort team members"
+          value={f.sort}
+          onChange={(v) => set('sort', v)}
+          options={[
+            { value: 'name', label: 'Name A–Z' },
+            { value: 'dept', label: 'Department A–Z' },
+            { value: 'role', label: 'Role A–Z' },
+          ]}
+        />
       </div>
 
       <p className="swipe-hint">Swipe the table sideways to see all columns</p>

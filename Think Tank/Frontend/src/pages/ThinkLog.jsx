@@ -5,6 +5,7 @@ import CreateTaskModal from '../components/thinklog/CreateTaskModal';
 import LogViewModal from '../components/thinklog/LogViewModal';
 import EditPointModal from '../components/thinklog/EditPointModal';
 import BackLink from '../components/layout/BackLink';
+import Select from '../components/ui/Select';
 import { useApp } from '../store/AppContext';
 import { useAuth } from '../store/AuthContext';
 import { useToast } from '../store/ToastContext';
@@ -428,26 +429,30 @@ export default function ThinkLog() {
           </div>
 
           <div className="idea-filters tl-filters">
-            <div className="select-box">
-              <select aria-label="Filter logs by date" value={period} onChange={(e) => setPeriod(e.target.value)}>
-                <option value="all">Any date</option>
-                <option value="0">Today</option>
-                <option value="7">Last 7 days</option>
-                <option value="30">Last 30 days</option>
-                <option value="90">Last 3 months</option>
-              </select>
-              <ChevronDownIcon />
-            </div>
+            <Select
+              label="Filter logs by date"
+              value={period}
+              onChange={setPeriod}
+              options={[
+                { value: 'all', label: 'Any date' },
+                { value: '0', label: 'Today' },
+                { value: '7', label: 'Last 7 days' },
+                { value: '30', label: 'Last 30 days' },
+                { value: '90', label: 'Last 3 months' },
+              ]}
+            />
 
-            <div className="select-box">
-              <select aria-label="Filter logs by outcome" value={kind} onChange={(e) => setKind(e.target.value)}>
-                <option value="all">All points</option>
-                <option value="idea">Became ideas</option>
-                <option value="task">Became tasks</option>
-                <option value="open">Still open</option>
-              </select>
-              <ChevronDownIcon />
-            </div>
+            <Select
+              label="Filter logs by outcome"
+              value={kind}
+              onChange={setKind}
+              options={[
+                { value: 'all', label: 'All points' },
+                { value: 'idea', label: 'Became ideas' },
+                { value: 'task', label: 'Became tasks' },
+                { value: 'open', label: 'Still open' },
+              ]}
+            />
           </div>
 
           <div>

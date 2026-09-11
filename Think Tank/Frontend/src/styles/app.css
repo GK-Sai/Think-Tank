@@ -44,15 +44,19 @@ a.nav-item > span:first-of-type {
    kept here rather than edited into that file so the change is one block
    that can be read, and if need be removed, in one piece.
 
-   Breakpoint: 1024px and under is "phone or tablet". The desktop layout is
-   deliberately untouched.
+   Breakpoint: 1279px and under is "phone or tablet". It was 1024px, which
+   turned out to be just short of a real tablet — above the line the desktop
+   layout applies, and at 1100px that layout does not fit: the fourth stat card
+   hangs off the screen and the Think Log's two columns squash to one word per
+   line. A laptop starts at 1280px; everything below it gets the fitted
+   layout.
    ===================================================================== */
 
 /* --- one control size, everywhere -----------------------------------
    Dropdowns were set at body size while the pills and tags beside them
    were small, so two controls doing the same job disagreed on the same
    row. One size for every select on a phone or tablet. */
-@media (max-width: 1024px) {
+@media (max-width: 1279px) {
   .filters .filter-pill select,
   .select-box select,
   .idea-filters select,
@@ -73,7 +77,7 @@ a.nav-item > span:first-of-type {
 }
 
 /* --- 01 · the status control beside the status pill ------------------ */
-@media (max-width: 1024px) {
+@media (max-width: 1279px) {
   .idea-status-row select,
   .status-select select,
   .idea-head .select-box select {
@@ -251,7 +255,7 @@ input[type="date"] { accent-color: var(--brand, #1d4ed8); }
    The tablet was falling between the two: too wide for the fold-away
    button, too narrow for the full filter row. It now uses the same
    folded field the phone does, all the way up to the desktop. */
-@media (max-width: 1024px) {
+@media (max-width: 1279px) {
   .idea-filters .search-box { display: none; }
   .sec-head .hs-btn { display: inline-grid; }
   .sec-head .head-search { max-width: 220px; }
@@ -261,7 +265,7 @@ input[type="date"] { accent-color: var(--brand, #1d4ed8); }
 /* --- 05 · the four counts, one block, one order ---------------------- */
 .statcards { margin-bottom: 12px; }
 
-@media (max-width: 1024px) {
+@media (max-width: 1279px) {
   .statcards {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -272,7 +276,7 @@ input[type="date"] { accent-color: var(--brand, #1d4ed8); }
   .statcard .lab { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 }
 
-@media (min-width: 641px) and (max-width: 1024px) {
+@media (min-width: 641px) and (max-width: 1279px) {
   .statcards { grid-template-columns: repeat(4, minmax(0, 1fr)); }
 }
 
@@ -281,7 +285,7 @@ input[type="date"] { accent-color: var(--brand, #1d4ed8); }
    wide as its longest option while the arrow stayed pinned to the right of
    the slot — so a channel of empty space opened between the words and the
    chevron that belongs to them. */
-@media (max-width: 1024px) {
+@media (max-width: 1279px) {
   .filters {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -350,3 +354,113 @@ input[type="date"] { accent-color: var(--brand, #1d4ed8); }
 }
 .tl-datehead .tl-date { margin: 0; }
 .tl-datehead .back-link.back-arrow { float: none; margin: 0; }
+
+/* --- 12 · the tablet gets one column ---------------------------------
+   The two-column think log is a desktop shape. Between 1024 and 1280 it was
+   still being applied, which left the left column about 200px wide and the
+   notes wrapping one word per line. */
+/* Only in the band where the desktop grid was being applied to a screen too
+   narrow for it. Below 1024 the app's own mobile rules already stack this
+   page, and overriding them there forced a grid track wider than the phone. */
+@media (min-width: 1025px) and (max-width: 1279px) {
+  .tl-grid { grid-template-columns: minmax(0, 1fr); }
+  .tl-grid > * { min-width: 0; }
+}
+
+@media (max-width: 1279px) {
+  .bt-wrap { overflow-x: auto; }
+}
+
+/* --- 14 · the app's own dropdown -------------------------------------
+   A native <select> hands its list to the operating system, which picks the
+   direction from the room below the control — on the Think Log filters that
+   meant it opened upward, over the heading and the Jump to Today button — and
+   ignores the page's font size. Neither is reachable from CSS. So the list is
+   drawn here instead: downward, small, the same on every device.
+
+   The wrapper keeps `.select-box` so every layout rule that sized these
+   controls still applies. */
+.tt-select { position: relative; }
+
+.tt-select .tt-select-btn {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  background: transparent;
+  border: 0;
+  font: inherit;
+  font-size: 13px;
+  color: inherit;
+  text-align: left;
+  padding: 9px 12px;
+  cursor: pointer;
+  min-width: 0;
+}
+
+.tt-select .tt-select-btn > .tt-select-value {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  min-width: 0;
+}
+
+.tt-select .tt-select-btn svg {
+  flex: 0 0 auto;
+  width: 16px;
+  height: 16px;
+  opacity: .65;
+  transition: transform .15s ease;
+}
+
+.tt-select.open .tt-select-btn svg { transform: rotate(180deg); }
+
+.tt-select-list {
+  position: absolute;
+  left: 0;
+  right: 0;
+  z-index: 60;
+  margin: 4px 0 0;
+  padding: 4px;
+  list-style: none;
+  background: var(--card, #fff);
+  border: 1px solid var(--border, #dbe2ef);
+  border-radius: 10px;
+  box-shadow: 0 10px 30px rgba(16, 26, 48, .16);
+  max-height: 260px;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+/* Downward is the rule. Upward happens only when the list genuinely will not
+   fit below and there is more room above — see Select.jsx. */
+.tt-select-list.down { top: 100%; }
+.tt-select-list.up { bottom: 100%; margin: 0 0 4px; }
+
+.tt-select-opt {
+  display: block;
+  width: 100%;
+  border: 0;
+  background: transparent;
+  font: inherit;
+  font-size: 12.5px;
+  text-align: left;
+  color: var(--text, #16233d);
+  padding: 8px 10px;
+  border-radius: 7px;
+  cursor: pointer;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.tt-select-opt.active { background: #eff4ff; }
+.tt-select-opt.on { color: var(--brand, #1d4ed8); font-weight: 600; }
+.tt-select-opt:focus-visible { outline: 2px solid var(--brand, #1d4ed8); outline-offset: -2px; }
+
+/* One size on a phone or tablet, control and list alike. */
+@media (max-width: 1279px) {
+  .tt-select .tt-select-btn { font-size: 12.5px; padding-block: 7px; }
+  .tt-select-opt { font-size: 12.5px; padding-block: 7px; }
+}

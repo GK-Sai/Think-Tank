@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import Pager from '../ui/Pager';
+import Select from '../ui/Select';
 import { useApp } from '../../store/AppContext';
 import { TODAY, parseYmd, daysBetween } from '../../lib/date';
 import { effStatus, displayName } from '../../lib/format';
@@ -179,46 +180,57 @@ export default function AdminTaskOverview({ onViewTask }) {
       </div>
 
       <div className="filters">
-        <label className="filter-pill">
-          <select aria-label="Date range" value={filters.range} onChange={(e) => setFilter('range', e.target.value)}>
-            <option value="all">Date Range</option>
-            <option value="today">Today</option>
-            <option value="week">This week</option>
-            <option value="month">This month</option>
-            <option value="overdue">Past due</option>
-          </select>
-        </label>
-        <label className="filter-pill">
-          <select aria-label="Status" value={filters.status} onChange={(e) => setFilter('status', e.target.value)}>
-            <option value="all">Status</option>
-            <option value="In Progress">In Progress</option>
-            <option value="Completed">Completed</option>
-            <option value="Overdue">Overdue</option>
-            <option value="Re Assign">Re Assign</option>
-          </select>
-        </label>
-        <label className="filter-pill">
-          <select aria-label="Team member" value={filters.member} onChange={(e) => setFilter('member', e.target.value)}>
-            <option value="all">Team Member</option>
-            {team.map((m) => (
-              <option key={m.id} value={m.name}>{displayName(m.name, m.accountRole)}</option>
-            ))}
-          </select>
-        </label>
-        <label className="filter-pill">
-          <select aria-label="Department" value={filters.dept} onChange={(e) => setFilter('dept', e.target.value)}>
-            <option value="all">Department</option>
-            {depts.map((d) => <option key={d} value={d}>{d}</option>)}
-          </select>
-        </label>
-        <label className="filter-pill">
-          <select aria-label="Priority" value={filters.priority} onChange={(e) => setFilter('priority', e.target.value)}>
-            <option value="all">Priority</option>
-            <option value="High">High</option>
-            <option value="Medium">Medium</option>
-            <option value="Low">Low</option>
-          </select>
-        </label>      </div>
+        <Select
+          label="Date range"
+          value={filters.range}
+          onChange={(v) => setFilter('range', v)}
+          options={[
+            { value: 'all', label: 'Date Range' },
+            { value: 'today', label: 'Today' },
+            { value: 'week', label: 'This week' },
+            { value: 'month', label: 'This month' },
+            { value: 'overdue', label: 'Past due' },
+          ]}
+        />
+        <Select
+          label="Status"
+          value={filters.status}
+          onChange={(v) => setFilter('status', v)}
+          options={[
+            { value: 'all', label: 'Status' },
+            { value: 'In Progress', label: 'In Progress' },
+            { value: 'Completed', label: 'Completed' },
+            { value: 'Overdue', label: 'Overdue' },
+            { value: 'Re Assign', label: 'Re Assign' },
+          ]}
+        />
+        <Select
+          label="Team member"
+          value={filters.member}
+          onChange={(v) => setFilter('member', v)}
+          options={[
+            { value: 'all', label: 'Team Member' },
+            ...team.map((m) => ({ value: m.name, label: displayName(m.name, m.accountRole) })),
+          ]}
+        />
+        <Select
+          label="Department"
+          value={filters.dept}
+          onChange={(v) => setFilter('dept', v)}
+          options={[{ value: 'all', label: 'Department' }, ...depts.map((d) => ({ value: d, label: d }))]}
+        />
+        <Select
+          label="Priority"
+          value={filters.priority}
+          onChange={(v) => setFilter('priority', v)}
+          options={[
+            { value: 'all', label: 'Priority' },
+            { value: 'High', label: 'High' },
+            { value: 'Medium', label: 'Medium' },
+            { value: 'Low', label: 'Low' },
+          ]}
+        />
+      </div>
 
       <p className="swipe-hint">Swipe the table sideways to see all columns</p>
       <div className="bt-wrap">
