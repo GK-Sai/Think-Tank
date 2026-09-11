@@ -76,9 +76,12 @@ export default function Sidebar({ open, collapsed, onToggleCollapsed, onNavigate
 
       <span className="nav-spacer" />
 
+      {/* The icon sits after the label here, unlike every other nav item: this
+          one is a way out rather than a place to go, and an arrow pointing
+          away from the list reads as leaving it. */}
       <button className="nav-item signout" onClick={handleSignOut} title="Sign Out">
-        <SignOutIcon />
         <span>Sign Out</span>
+        <SignOutIcon />
       </button>
     </aside>
   );

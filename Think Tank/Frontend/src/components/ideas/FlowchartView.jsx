@@ -155,6 +155,40 @@ export default function FlowchartView({ value, plain = false }) {
 
   useLayoutEffect(measure, [measure, size.w, size.h]);
 
+  /* ---- why the arrows used to be missing ----
+
+     The paths are built by measuring the rendered boxes, so a measurement
+     taken before the browser has laid them out produces nothing to draw. That
+     is exactly what happens on the frame this view first mounts — coming back
+     from Save, or opening the editor's preview — and there was nothing to make
+     it look again: `measure` only re-ran when the measured size changed, and a
+     size of zero never changes to a size of zero.
+
+     Two things fix it. The refs are dropped whenever the chart itself changes,
+     so nothing is measured against boxes belonging to the chart before it; and
+     the measurement is taken again after the browser has painted, and once
+     more after the web font has settled, because a label in the fallback face
+     is a different width from the same label in the real one. */
+  const chartKey = `${shapes.map((s) => s.id).join(',')}|${links.length}`;
+
+  useLayoutEffect(() => {
+    nodeRefs.current = {};
+  }, [chartKey]);
+
+  useEffect(() => {
+    const frame = requestAnimationFrame(measure);
+    const settle = setTimeout(measure, 120);
+    let cancelled = false;
+    if (typeof document !== 'undefined' && document.fonts?.ready) {
+      document.fonts.ready.then(() => { if (!cancelled) measure(); }).catch(() => {});
+    }
+    return () => {
+      cancelled = true;
+      cancelAnimationFrame(frame);
+      clearTimeout(settle);
+    };
+  }, [chartKey, measure]);
+
   /* The box narrows when the column does — and on a phone it narrows a lot —
      so both the arrows and the fit have to be worked out again. */
   useEffect(() => {

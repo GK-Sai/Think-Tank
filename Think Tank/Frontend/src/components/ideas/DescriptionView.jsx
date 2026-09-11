@@ -1,5 +1,4 @@
 import FlowchartView from './FlowchartView';
-import TextZoom from './TextZoom';
 import { fmtSize, extOf } from '../../lib/format';
 import { emptyDescription } from '../../data/seed';
 
@@ -15,15 +14,21 @@ import { emptyDescription } from '../../data/seed';
  * *version* of an idea is drawn this way — the chairman's original flowchart
  * as well as the one a member edited it into.
  *
- * `plain` drops the zoom controls and shows everything at its own size. That
- * is the printing case: how somebody has zoomed a description to read it on
- * screen is not how they want it on paper.
+ * `plain` is the printing case: the flowchart at the size that fits the
+ * sheet, with nothing to press.
+ *
+ * **Words carry no zoom control.** Bullet points and a paragraph used to sit
+ * under the same − / Fit / + buttons a flowchart has. Text does not need
+ * them: it reflows to whatever width it is given, and a reader who wants it
+ * larger has already set that in their browser or their phone. The buttons
+ * took a corner of every description to do a job that was already done.
+ *
+ * The flowchart keeps its own, inside the drawing — that one is a picture, it
+ * does not reflow, and on a phone it cannot be read without zooming.
  */
 export default function DescriptionView({ type, content, fallbackText = '', plain = false }) {
   const c = { ...emptyDescription(), ...(content || {}) };
-  /* Words are zoomed by resizing the type and letting the lines re-wrap;
-     a flowchart is a picture and does its own, inside the drawing. */
-  const wrap = (label, node) => (plain ? node : <TextZoom label={label}>{node}</TextZoom>);
+  const wrap = (label, node) => node;
 
   if (type === 'flowchart') {
     return <FlowchartView value={c.flowchart} plain={plain} />;

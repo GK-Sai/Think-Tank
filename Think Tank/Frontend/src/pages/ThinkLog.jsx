@@ -218,12 +218,15 @@ export default function ThinkLog() {
 
   return (
     <>
-      <BackLink to="/" label="Back to Dashboard" />
-
       <div className="tl-grid">
         {/* ---------- composer ---------- */}
         <div>
-          <div className="tl-date">{fmtLong(TODAY)}</div>
+          {/* This page's heading is the date, so the back arrow sits on that
+              line rather than on one of its own. */}
+          <div className="tl-datehead">
+            <BackLink to="/" label="Back to Dashboard" />
+            <div className="tl-date">{fmtLong(TODAY)}</div>
+          </div>
 
           <div className="tl-card">
             <textarea
@@ -378,10 +381,22 @@ export default function ThinkLog() {
 
         {/* ---------- past logs ---------- */}
         <div className="tl-past">
-          <div className="jump-row">
+          {/* Three rows, in the order they are read: what this is and the one
+              action that resets it, then the field you search with, then the
+              two things you narrow it by. "Jump to Today" sits on the
+              heading's line because it belongs to the list as a whole, not to
+              the filters underneath. */}
+          <div className="tl-head-row">
+            <h3 className="tl-h3">
+              Think Logs
+              <span className="tl-count">
+                {filtered.length}{filtered.length !== thinkLogs.length && ` of ${thinkLogs.length}`}
+              </span>
+            </h3>
+
             <button
               type="button"
-              className="btn-add"
+              className="btn-add tl-jump"
               onClick={() => {
                 setQuery('');
                 setSearchOpen(false);
@@ -395,41 +410,11 @@ export default function ThinkLog() {
               <CalendarIcon />
               Jump to Today
             </button>
-
-            {/* On a phone the field itself was a whole row spent on something
-                you use now and then. It is the icon until you ask for it, at
-                the far right of this row; the desktop keeps the open field
-                below, so this button is not there. */}
-            <button
-              type="button"
-              className={`jump-search${searchOpen ? ' on' : ''}`}
-              aria-expanded={searchOpen}
-              aria-controls="logSearch"
-              aria-label={searchOpen ? 'Hide log search' : 'Search past logs'}
-              title="Search past logs"
-              onClick={() => {
-                const next = !searchOpen;
-                setSearchOpen(next);
-                if (next) setTimeout(() => searchRef.current?.focus(), 0);
-                else setQuery('');
-              }}
-            >
-              <SearchIcon />
-            </button>
           </div>
 
-          <h3 className="tl-h3" style={{ marginTop: 0 }}>
-            Think Logs
-            <span className="tl-count">
-              {filtered.length}{filtered.length !== thinkLogs.length && ` of ${thinkLogs.length}`}
-            </span>
-          </h3>
-
-          <div
-            id="logSearch"
-            className={`search-wrap tl-search${searchOpen ? ' open' : ''}`}
-            style={{ marginBottom: 8 }}
-          >
+          {/* The field is always here now. Folding it behind an icon saved a
+              row and cost a tap on the thing this panel is for. */}
+          <div id="logSearch" className="search-wrap tl-search open">
             <SearchIcon />
             <input
               ref={searchRef}

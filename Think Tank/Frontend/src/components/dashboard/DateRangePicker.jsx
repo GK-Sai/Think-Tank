@@ -67,10 +67,29 @@ export default function DateRangePicker({ value, onApply }) {
     setOpen((v) => !v);
   };
 
-  const apply = () => {
-    const [f, t, label] = rangeBounds(pending, from, to);
-    onApply({ key: pending, from: f, to: t, label });
+  const applyKey = (key, f0 = from, t0 = to) => {
+    const [f, t, label] = rangeBounds(key, f0, t0);
+    onApply({ key, from: f, to: t, label });
     setOpen(false);
+  };
+
+  const apply = () => applyKey(pending);
+
+  /**
+   * A named range is one tap.
+   *
+   * Today, Yesterday, This Week and the rest are a single unambiguous choice
+   * — there is nothing half-picked about them — so making the reader confirm
+   * with Apply spent a second tap on a decision that takes one tap to undo.
+   * They apply on touch and the menu closes.
+   *
+   * Custom Range is the exception, and keeps Cancel and Apply: a range is two
+   * dates, and redrawing the page the moment the first one is chosen would
+   * show a range nobody asked for.
+   */
+  const choose = (key) => {
+    setPending(key);
+    if (key !== 'custom') applyKey(key);
   };
 
   const triggerLabel = value.key === 'today' ? fmtLong(TODAY) : value.label;
@@ -100,7 +119,7 @@ export default function DateRangePicker({ value, onApply }) {
             type="button"
             role="menuitem"
             className={`range-opt${pending === key ? ' selected' : ''}`}
-            onClick={() => setPending(key)}
+            onClick={() => choose(key)}
           >
             {label}
           </button>
@@ -111,10 +130,13 @@ export default function DateRangePicker({ value, onApply }) {
           <label>To<input type="date" value={to} onChange={(e) => setTo(e.target.value)} /></label>
         </div>
 
-        <div className="range-actions">
-          <button type="button" className="btn-cancel" onClick={() => setOpen(false)}>Cancel</button>
-          <button type="button" className="btn-apply" onClick={apply}>Apply</button>
-        </div>
+        {/* Only the custom range needs confirming — see `choose` above. */}
+        {pending === 'custom' && (
+          <div className="range-actions">
+            <button type="button" className="btn-cancel" onClick={() => setOpen(false)}>Cancel</button>
+            <button type="button" className="btn-apply" onClick={apply}>Apply</button>
+          </div>
+        )}
       </div>
     </div>
   );

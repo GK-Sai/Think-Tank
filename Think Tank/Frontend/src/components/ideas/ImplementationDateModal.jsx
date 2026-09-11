@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import Modal from '../ui/Modal';
+import DatePicker, { fmtDMY } from '../ui/DatePicker';
 import { TODAY, ymd } from '../../lib/date';
 
 /** Chairman-only: the date an approved idea is meant to go live. */
@@ -51,16 +52,22 @@ export default function ImplementationDateModal({ open, current, onClose, onSave
         </>
       }
     >
-      <div className="field-row">
-        <label htmlFor="implDate">Implementation date</label>
-        <input
-          id="implDate"
-          type="date"
-          value={date}
-          min={ymd(TODAY)}
-          onChange={(e) => setDate(e.target.value)}
-        />
+      {/* Label and value at the same size — the label used to be set larger
+          than the date it labels, which read as the heading of the dialog
+          rather than the name of a field. */}
+      <div className="field-row impl-date-row">
+        <label htmlFor="implDate" className="impl-date-label">Implementation date</label>
+        <output className="impl-date-value" htmlFor="implDate">
+          {date ? fmtDMY(date) : 'Not set'}
+        </output>
       </div>
+
+      <DatePicker
+        id="implDate"
+        value={date}
+        min={ymd(TODAY)}
+        onChange={setDate}
+      />
       <p className="modal-hint">
         Setting a date on an idea still under review also marks it Approved.
       </p>

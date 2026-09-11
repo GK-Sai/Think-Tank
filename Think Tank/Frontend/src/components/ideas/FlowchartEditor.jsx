@@ -222,6 +222,15 @@ export default function FlowchartEditor({ value, onChange }) {
   const addShape = (type, label) => {
     const n = shapes.length;
     seq.current += 1;
+
+    /* A step is numbered by the steps before it, not by everything on the
+       canvas. Counting shapes meant a Start, a decision and an End all took a
+       number with them, so the first process after them came out "Step 6" and
+       Steps 2 to 5 existed nowhere — a chart that reads as though most of it
+       had been deleted. Only process boxes are counted, so they run 1, 2, 3
+       however many terminators and decisions sit between them. */
+    const stepNo = shapes.filter((s) => (s.type || 'process') === 'process').length + 1;
+
     /* New shapes are laid out three to a row, and always inside the width in
        front of the person adding them — never off the edge. */
     const perRow = Math.max(1, Math.min(3, Math.floor(((canvasRef.current?.clientWidth || 600) - 30) / 190)));
@@ -231,7 +240,7 @@ export default function FlowchartEditor({ value, onChange }) {
         {
           id: `n${seq.current}_${n}`,
           type,
-          label: label ?? (type === 'decision' ? 'Decision?' : `Step ${n + 1}`),
+          label: label ?? (type === 'decision' ? 'Decision?' : `Step ${stepNo}`),
           x: 30 + (n % perRow) * 190,
           y: 26 + Math.floor(n / perRow) * 110,
         },
@@ -479,7 +488,10 @@ export default function FlowchartEditor({ value, onChange }) {
           <div className="fc-empty">
             <strong>Flowchart Canvas</strong>
             <span>Add shapes from the toolbar above, then drag them into place.</span>
-            <button type="button" className="btn-solid sm" onClick={() => addShape('process')}>Add Shape</button>
+            {/* On an empty canvas this is the first shape of the chart, and a
+                chart begins at Start. It used to drop a process box, so every
+                new flowchart opened on a middle step with nothing before it. */}
+            <button type="button" className="btn-solid sm" onClick={() => addShape('terminator', 'Start')}>Add Shape</button>
           </div>
         )}
 

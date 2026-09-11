@@ -36,3 +36,317 @@ a.nav-item > span:first-of-type {
 .brand-tile img {
   padding: 3px;
 }
+
+/* =====================================================================
+   Mobile & tablet revisions — September 2026
+   ---------------------------------------------------------------------
+   Everything below is an override on global.css, which loads first. It is
+   kept here rather than edited into that file so the change is one block
+   that can be read, and if need be removed, in one piece.
+
+   Breakpoint: 1024px and under is "phone or tablet". The desktop layout is
+   deliberately untouched.
+   ===================================================================== */
+
+/* --- one control size, everywhere -----------------------------------
+   Dropdowns were set at body size while the pills and tags beside them
+   were small, so two controls doing the same job disagreed on the same
+   row. One size for every select on a phone or tablet. */
+@media (max-width: 1024px) {
+  .filters .filter-pill select,
+  .select-box select,
+  .idea-filters select,
+  .range-opt,
+  .statcard .lab {
+    font-size: 12.5px;
+  }
+
+  .filters .filter-pill,
+  .select-box {
+    min-height: 34px;
+  }
+
+  .filters .filter-pill select,
+  .select-box select {
+    padding-block: 6px;
+  }
+}
+
+/* --- 01 · the status control beside the status pill ------------------ */
+@media (max-width: 1024px) {
+  .idea-status-row select,
+  .status-select select,
+  .idea-head .select-box select {
+    font-size: 12.5px;
+    padding-block: 5px;
+  }
+}
+
+/* --- 02 · implementation date: label and value at one size ----------- */
+.impl-date-row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.impl-date-label {
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+.impl-date-value {
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: .04em;
+  font-variant-numeric: tabular-nums;
+  color: var(--text);
+}
+
+/* --- 02 · the app's own calendar ------------------------------------
+   Blue and white on every device. The phone's own picker is no longer
+   opened, so its teal header and green buttons are gone with it. */
+.tt-cal {
+  margin-top: 10px;
+  border: 1px solid var(--border, #dbe2ef);
+  border-radius: 12px;
+  overflow: hidden;
+  background: #fff;
+}
+
+.tt-cal-head {
+  background: var(--brand, #1d4ed8);
+  color: #fff;
+  padding: 10px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.tt-cal-year {
+  font-size: 11px;
+  opacity: .85;
+  letter-spacing: .08em;
+  min-height: 14px;
+}
+
+.tt-cal-day {
+  font-size: 19px;
+  font-weight: 700;
+  letter-spacing: -.01em;
+}
+
+.tt-cal-body {
+  padding: 10px 12px 14px;
+  background: #fff;
+}
+
+.tt-cal-nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.tt-cal-month {
+  font-size: 13.5px;
+  font-weight: 600;
+  color: #16233d;
+}
+
+.tt-cal-arrow {
+  width: 30px;
+  height: 30px;
+  border-radius: 8px;
+  border: 1px solid var(--border, #dbe2ef);
+  background: #fff;
+  color: var(--brand, #1d4ed8);
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+}
+
+.tt-cal-arrow svg { width: 16px; height: 16px; transform: rotate(90deg); }
+.tt-cal-arrow.next svg { transform: rotate(-90deg); }
+.tt-cal-arrow:hover { background: #eff4ff; }
+
+.tt-cal-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 2px;
+}
+
+.tt-cal-wd {
+  text-align: center;
+  font-size: 11px;
+  font-weight: 600;
+  color: #8a94ab;
+  padding-bottom: 4px;
+}
+
+.tt-cal-blank { display: block; }
+
+.tt-cal-d {
+  aspect-ratio: 1;
+  min-height: 34px;
+  border: 0;
+  background: transparent;
+  border-radius: 50%;
+  font-size: 13px;
+  color: #16233d;
+  cursor: pointer;
+  font-variant-numeric: tabular-nums;
+}
+
+.tt-cal-d:hover:not(:disabled) { background: #eff4ff; }
+.tt-cal-d.today { box-shadow: inset 0 0 0 1.5px var(--brand, #1d4ed8); color: var(--brand, #1d4ed8); font-weight: 600; }
+.tt-cal-d.on { background: var(--brand, #1d4ed8); color: #fff; font-weight: 700; }
+.tt-cal-d:disabled { color: #c3cad8; cursor: default; }
+
+/* The custom range in the dashboard picker still uses native date inputs;
+   at least make their selected day blue rather than the OS accent. */
+.custom-range input[type="date"],
+input[type="date"] { accent-color: var(--brand, #1d4ed8); }
+
+/* --- 03 · Think Log header ------------------------------------------
+   Row 1: heading left, Jump to Today hard right.
+   Row 2: search, full width.
+   Row 3: the two filters, one at each end. */
+.tl-head-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.tl-head-row .tl-h3 { margin: 0; }
+
+.tl-jump {
+  flex: 0 0 auto;
+  font-size: 12.5px;
+  padding: 7px 12px;
+  white-space: nowrap;
+}
+
+.tl-jump svg { width: 15px; height: 15px; }
+
+/* The field no longer folds away behind an icon. */
+.tl-search { display: flex; margin-bottom: 8px; }
+.tl-search .soft-in { font-size: 13px; }
+.jump-row, .jump-search { display: none; }
+
+/* Two halves of one row, not two things pushed to opposite walls. Spacing
+   them apart left a channel of empty card between two controls that belong
+   together, and made each one look narrower than the field above it. */
+.tl-filters { display: flex; gap: 8px; }
+.tl-filters .select-box { flex: 1 1 0; min-width: 0; }
+.tl-filters .select-box select { width: 100%; }
+
+/* --- 04 · Task Overview search, small and top right ------------------
+   The tablet was falling between the two: too wide for the fold-away
+   button, too narrow for the full filter row. It now uses the same
+   folded field the phone does, all the way up to the desktop. */
+@media (max-width: 1024px) {
+  .idea-filters .search-box { display: none; }
+  .sec-head .hs-btn { display: inline-grid; }
+  .sec-head .head-search { max-width: 220px; }
+  .sec-head .head-search input { font-size: 12.5px; padding-block: 6px; }
+}
+
+/* --- 05 · the four counts, one block, one order ---------------------- */
+.statcards { margin-bottom: 12px; }
+
+@media (max-width: 1024px) {
+  .statcards {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px;
+  }
+  .statcard { padding: 10px 12px; }
+  .statcard .num { font-size: 20px; }
+  .statcard .lab { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+}
+
+@media (min-width: 641px) and (max-width: 1024px) {
+  .statcards { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+}
+
+/* The filter row sits under the counts and fills the screen: two per line,
+   each taking half the width. Left to size themselves, each select was as
+   wide as its longest option while the arrow stayed pinned to the right of
+   the slot — so a channel of empty space opened between the words and the
+   chevron that belongs to them. */
+@media (max-width: 1024px) {
+  .filters {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px;
+    margin-bottom: 12px;
+    overflow: visible;
+  }
+  .filters .filter-pill { width: 100%; min-width: 0; margin: 0; }
+  .filters .filter-pill select {
+    width: 100%;
+    min-width: 0;
+    text-overflow: ellipsis;
+  }
+}
+
+/* --- 07 · sign out, arrow last -------------------------------------- */
+.nav-item.signout { justify-content: space-between; }
+.nav-item.signout > span { flex: 1; text-align: left; }
+.nav-item.signout svg { flex: 0 0 auto; }
+
+/* --- 08 · the back arrow sits beside the heading --------------------
+   A flex container is placed alongside a float rather than under it, and
+   every page here puts its heading block (.sec-head / .page-head, both
+   flex) straight after the back control — so floating the arrow puts the
+   two on one line without touching seven page files. */
+.back-link.back-arrow {
+  float: left;
+  width: 34px;
+  height: 34px;
+  padding: 0;
+  margin: 0 8px 8px 0;
+  border-radius: 9px;
+  display: grid;
+  place-items: center;
+  gap: 0;
+  font-size: 0;
+}
+
+.back-link.back-arrow svg { width: 19px; height: 19px; }
+
+/* The heading that follows sits on the arrow's line. */
+.back-link.back-arrow + .sec-head,
+.back-link.back-arrow + .page-head { clear: none; }
+
+.back-link.back-arrow + .sec-head .sh-txt h2,
+.back-link.back-arrow + .page-head .page-h { margin-top: 2px; }
+
+/* Anything that is genuinely a new block still starts below it. */
+.tl-grid, .bt-wrap, .statcards { clear: both; }
+
+/* --- 10 · the date range applies on tap ----------------------------- */
+.range-menu .range-actions { margin-top: 8px; }
+
+/* The pill is a flex item now, so the control inside it has to fill it —
+   otherwise the select keeps its content width and the chevron drawn at the
+   pill's right edge floats away from the field it belongs to. */
+
+
+/* Think Log has no heading block of its own — the date is its heading — so
+   the arrow joins that row rather than floating above the whole grid. */
+.tl-datehead {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+.tl-datehead .tl-date { margin: 0; }
+.tl-datehead .back-link.back-arrow { float: none; margin: 0; }

@@ -40,7 +40,18 @@ export const toDate = (value) => {
   if (value instanceof Date) return value;
   const s = String(value ?? '');
   if (!s) return new Date(NaN);
-  if (s.includes('T')) return new Date(s);
+  if (s.includes('T')) {
+    /* A timestamp with no zone on the end is the one case the browser gets
+       wrong for us. `new Date('2026-09-11T06:15:00')` is read as 6:15 in
+       *this* reader's timezone — but everything in this app is stored in UTC,
+       so 6:15 UTC was being printed as 6:15 local. In India that is the whole
+       of the "I raised it at 11:45 and the bell says 6:15" complaint: five and
+       a half hours, exactly the offset.
+       The API sends its offset and is unaffected by this; only a naive
+       timestamp is reinterpreted, and UTC is what a naive one means here. */
+    const zoned = /(?:Z|[+-]\d{2}:?\d{2})$/i.test(s);
+    return new Date(zoned ? s : `${s}Z`);
+  }
   const [y, m, d] = s.split('-').map(Number);
   if (!y || !m || !d) return new Date(NaN);
   return new Date(y, m - 1, d);

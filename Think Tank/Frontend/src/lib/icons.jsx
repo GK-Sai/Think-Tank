@@ -72,11 +72,15 @@ export const LogIcon = (p) => (
 /* The door sits on the right and the arrow leaves through it. In the left
    sidebar that reads as "on your way out"; the mirrored version pointed the
    arrow back into the app, which is the sign-in gesture, not sign-out. */
+/* The arrow leaves the door, it does not walk into it. Drawn the other way
+   round, with the doorway on the right and the arrow pointing back inside,
+   this is the icon every product uses for *sign in* — which is a confusing
+   thing to offer somebody who is already signed in. */
 export const SignOutIcon = (p) => (
   <Icon {...p}>
-    <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4" />
-    <path d="m10 17-5-5 5-5" />
-    <path d="M5 12h10" />
+    <path d="M9 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h4" />
+    <path d="m14 17 5-5-5-5" />
+    <path d="M19 12H9" />
   </Icon>
 );
 

@@ -147,6 +147,24 @@ export default function AdminTaskOverview({ onViewTask }) {
         </button>
       </div>
 
+      {/* The four counts, in one block and always in this order: the whole,
+          then the two that need attention, then the one that does not. They
+          used to be printed below the filter bar, so the numbers the page
+          exists to show came second to the controls that narrow them. */}
+      <div className="statcards">
+        {CARDS.map((c) => (
+          <button
+            key={c.key}
+            type="button"
+            className={`statcard ${c.cls}${filters.status === c.key ? ' on' : ''}`}
+            onClick={() => setFilter('status', c.key)}
+          >
+            <span className="lab">{c.label}</span>
+            <span className="num">{counts[c.key]}</span>
+          </button>
+        ))}
+      </div>
+
       <div className="idea-filters">
         <div className="search-box">
           <SearchIcon />
@@ -201,21 +219,6 @@ export default function AdminTaskOverview({ onViewTask }) {
             <option value="Low">Low</option>
           </select>
         </label>      </div>
-
-      {/* The stat cards double as the status filter. */}
-      <div className="statcards">
-        {CARDS.map((c) => (
-          <button
-            key={c.key}
-            type="button"
-            className={`statcard ${c.cls}${filters.status === c.key ? ' on' : ''}`}
-            onClick={() => setFilter('status', c.key)}
-          >
-            <span className="lab">{c.label}</span>
-            <span className="num">{counts[c.key]}</span>
-          </button>
-        ))}
-      </div>
 
       <p className="swipe-hint">Swipe the table sideways to see all columns</p>
       <div className="bt-wrap">
