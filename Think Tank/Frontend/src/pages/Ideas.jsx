@@ -4,6 +4,7 @@ import PageHead from '../components/layout/PageHead';
 import BackLink from '../components/layout/BackLink';
 import Select from '../components/ui/Select';
 import { IdeaPager } from '../components/ui/Pager';
+import useCompact from '../lib/useCompact';
 import { useApp } from '../store/AppContext';
 import { useAuth } from '../store/AuthContext';
 import { DEPARTMENTS } from '../data/seed';
@@ -35,11 +36,12 @@ export default function Ideas() {
   const navigate = useNavigate();
   const { isChair } = useAuth();
   const { myIdeas } = useApp();
+  const compact = useCompact();
 
   const [f, setF] = useState(BLANK);
   const [page, setPage] = useState(1);
-  /* Phone only — see Team.jsx: the field folds behind the icon at the right
-     of the heading and opens on that same line. */
+  /* Laptop only. On a phone or tablet the field is simply there, at the right
+     of the heading — see the note beside the markup. */
   const [searchOpen, setSearchOpen] = useState(false);
 
   // Any filter change starts again from page one — otherwise a narrow
@@ -84,27 +86,37 @@ export default function Ideas() {
 
   return (
     <>
-      <BackLink to="/" label="Back to Dashboard" />
+      {/* Laptop: the labelled button on its own line above the page. Phone
+          and tablet: the arrow goes inside the heading block — see PageHead. */}
+      {!compact && <BackLink to="/" label="Back to Dashboard" />}
 
       <PageHead
+        back={compact ? <BackLink to="/" label="Back to Dashboard" /> : null}
         title="Ideas"
-        subtitle={isChair
-          ? 'Every idea you have opened, and where each one got to'
-          : 'Every idea open to the team — join the ones you have something to say about'}
+        /* The line under the heading is gone on every one of these five
+           pages: on a phone it was pushing the list itself below the fold,
+           and it only ever restated what the page already shows. */
         /* Only the chairman opens an idea; everyone else joins the ones he
            has opened, so the button is simply not there for them. */
         action={isChair
           ? <button className="btn-solid" onClick={() => navigate('/ideas/new')}>Create New Idea</button>
           : null}
-        searching={searchOpen}
+        searching={!compact && searchOpen}
+        /* Phone and tablet: the field itself, top right of the heading — the
+           same as Task Overview, so the five pages no longer disagree about
+           where their search is. A control folded behind a magnifier is a
+           control half the people looking for it never find.
+
+           Laptop: untouched. The field lives in the filter row down the page
+           and this one folds away behind the icon, as it always did. */
         search={(
           <>
-            {searchOpen && (
-              <div className="search-box head-search">
+            {(compact || searchOpen) && (
+              <div className={`search-box head-search${compact ? ' always' : ''}`}>
                 <SearchIcon />
                 <input
                   type="search"
-                  autoFocus
+                  autoFocus={!compact}
                   placeholder="Search ideas"
                   aria-label="Search ideas"
                   value={f.query}
@@ -113,18 +125,20 @@ export default function Ideas() {
                 />
               </div>
             )}
-            <button
-              type="button"
-              className={`hs-btn${searchOpen ? ' on' : ''}`}
-              aria-label={searchOpen ? 'Close search' : 'Search ideas'}
-              aria-expanded={searchOpen}
-              onClick={() => {
-                if (searchOpen) set('query', '');
-                setSearchOpen((v) => !v);
-              }}
-            >
-              {searchOpen ? <CloseIcon /> : <SearchIcon />}
-            </button>
+            {!compact && (
+              <button
+                type="button"
+                className={`hs-btn${searchOpen ? ' on' : ''}`}
+                aria-label={searchOpen ? 'Close search' : 'Search ideas'}
+                aria-expanded={searchOpen}
+                onClick={() => {
+                  if (searchOpen) set('query', '');
+                  setSearchOpen((v) => !v);
+                }}
+              >
+                {searchOpen ? <CloseIcon /> : <SearchIcon />}
+              </button>
+            )}
           </>
         )}
       />

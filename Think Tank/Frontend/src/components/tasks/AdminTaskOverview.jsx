@@ -35,7 +35,7 @@ const CARDS = [
 
 const BLANK = { query: '', range: 'all', status: 'all', member: 'all', dept: 'all', priority: 'all' };
 
-export default function AdminTaskOverview({ onViewTask }) {
+export default function AdminTaskOverview({ onViewTask, back = null }) {
   const { tasks, team } = useApp();
   const compact = useCompact();
   const [filters, setFilters] = useState(BLANK);
@@ -127,12 +127,9 @@ export default function AdminTaskOverview({ onViewTask }) {
   return (
     <>
       <div className={`sec-head${!compact && searchOpen ? ' searching' : ''}`}>
+        {back}
         <div className="sh-txt">
           <h2>Admin Task Overview</h2>
-          <p>
-            {rows.length} task{rows.length === 1 ? '' : 's'}
-            {rows.length !== tasks.length && ` of ${tasks.length}`} across the organization
-          </p>
         </div>
 
         {/* Phone and tablet: the field itself, top right of the heading. It
@@ -178,9 +175,11 @@ export default function AdminTaskOverview({ onViewTask }) {
 
       {compact && statCards}
 
-      {/* Laptop only. On a phone or tablet the field is in the heading above
-          — see the note there — and this row is hidden rather than showing
-          the same search twice. */}
+      {/* One panel holds the search and all five filters, so they line up as
+          a block instead of five differently sized pills adrift on the page.
+          The search row inside it is laptop-only: on a phone or tablet the
+          field is in the heading above and this one would be the second. */}
+      <div className="filter-panel">
       <div className="idea-filters tasks-search">
         <div className="search-box">
           <SearchIcon />
@@ -245,6 +244,7 @@ export default function AdminTaskOverview({ onViewTask }) {
             { value: 'Low', label: 'Low' },
           ]}
         />
+      </div>
       </div>
 
       {/* Laptop: the stat cards double as the status filter, under the bar. */}

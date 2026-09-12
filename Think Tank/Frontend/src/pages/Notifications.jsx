@@ -1,7 +1,8 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import BackLink from '../components/layout/BackLink';
 import Select from '../components/ui/Select';
+import useCompact from '../lib/useCompact';
 import { useApp } from '../store/AppContext';
 import { useToast } from '../store/ToastContext';
 import { bucketOf, fmtWhen, fmtDateTime, toDate } from '../lib/date';
@@ -50,6 +51,7 @@ export default function Notifications() {
   const { notifs, markAllRead, unreadCount } = useApp();
   const toast = useToast();
   const navigate = useNavigate();
+  const compact = useCompact();
 
   const [tab, setTab] = useState('unread');
   const [query, setQuery] = useState('');
@@ -58,6 +60,17 @@ export default function Notifications() {
   /* Phone only — see Team.jsx: the field folds behind the icon at the right
      of the heading and opens on that same line. */
   const [searchOpen, setSearchOpen] = useState(false);
+
+  /* A minute hand. Every line on this page prints a clock, and a page left
+     open on a desk was still showing the time it showed when it loaded —
+     so "Today" stayed "Today" into the next morning and an item raised at
+     11:05 kept the label it was given hours earlier. Re-rendering once a
+     minute costs nothing and keeps every stamp honest. */
+  const [, tick] = useState(0);
+  useEffect(() => {
+    const id = setInterval(() => tick((n) => n + 1), 60000);
+    return () => clearInterval(id);
+  }, []);
 
   /* Which heading a notification sits under is worked out from its timestamp
      in the reader's own timezone, so nothing has to be relabelled as the day
@@ -88,20 +101,22 @@ export default function Notifications() {
 
   return (
     <>
-      <BackLink to="/" label="Back to Dashboard" />
+      {!compact && <BackLink to="/" label="Back to Dashboard" />}
 
-      <div className={`sec-head${searchOpen ? ' searching' : ''}`}>
+      <div className={`sec-head${!compact && searchOpen ? ' searching' : ''}`}>
+        {compact && <BackLink to="/" label="Back to Dashboard" />}
         <div className="sh-txt">
           <h2>Notifications</h2>
-          <p>{unreadCount ? `${unreadCount} unread` : 'All caught up'}</p>
         </div>
 
-        {searchOpen && (
-          <div className="search-box head-search">
+        {/* Phone and tablet: always there, top right of the heading — see
+            Ideas.jsx. Laptop: folded behind the icon as before. */}
+        {(compact || searchOpen) && (
+          <div className={`search-box head-search${compact ? ' always' : ''}`}>
             <SearchIcon />
             <input
               type="search"
-              autoFocus
+              autoFocus={!compact}
               placeholder="Search notifications"
               aria-label="Search notifications"
               value={query}
@@ -124,18 +139,20 @@ export default function Notifications() {
           {unreadCount === 0 ? 'All read' : 'Mark all as read'}
         </button>
 
-        <button
-          type="button"
-          className={`hs-btn${searchOpen ? ' on' : ''}`}
-          aria-label={searchOpen ? 'Close search' : 'Search notifications'}
-          aria-expanded={searchOpen}
-          onClick={() => {
-            if (searchOpen) setQuery('');
-            setSearchOpen((v) => !v);
-          }}
-        >
-          {searchOpen ? <CloseIcon /> : <SearchIcon />}
-        </button>
+        {!compact && (
+          <button
+            type="button"
+            className={`hs-btn${searchOpen ? ' on' : ''}`}
+            aria-label={searchOpen ? 'Close search' : 'Search notifications'}
+            aria-expanded={searchOpen}
+            onClick={() => {
+              if (searchOpen) setQuery('');
+              setSearchOpen((v) => !v);
+            }}
+          >
+            {searchOpen ? <CloseIcon /> : <SearchIcon />}
+          </button>
+        )}
       </div>
 
       <div className="nf-tabs">

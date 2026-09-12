@@ -428,7 +428,10 @@ export default function ThinkLog() {
                 </button>
               </div>
 
-              <div className="tl-searchrow">
+              {/* One panel, like every other page's filters: the field on its
+                  own line, then "Any date" and "All points" side by side
+                  underneath it — never one above the other. */}
+              <div className="filter-panel tl-panel">
                 <div id="logSearch" className="search-wrap tl-search open">
                   <SearchIcon />
                   <input
@@ -517,43 +520,46 @@ export default function ThinkLog() {
                 </span>
               </h3>
 
-              <div
-                id="logSearch"
-                className={`search-wrap tl-search${searchOpen ? ' open' : ''}`}
-                style={{ marginBottom: 8 }}
-              >
-                <SearchIcon />
-                <input
-                  ref={searchRef}
-                  type="search"
-                  className="soft-in"
-                  placeholder="Search past logs…"
-                  aria-label="Search past logs"
-                  value={query}
-                  onChange={(e) => setQuery(e.target.value)}
-                />
-              </div>
-
-              <div className="idea-filters tl-filters">
-                <div className="select-box">
-                  <select aria-label="Filter logs by date" value={period} onChange={(e) => setPeriod(e.target.value)}>
-                    <option value="all">Any date</option>
-                    <option value="0">Today</option>
-                    <option value="7">Last 7 days</option>
-                    <option value="30">Last 30 days</option>
-                    <option value="90">Last 3 months</option>
-                  </select>
-                  <ChevronDownIcon />
+              {/* The same panel as on a phone: field on top, the two filters
+                  side by side under it. */}
+              <div className="filter-panel tl-panel">
+                <div
+                  id="logSearch"
+                  className={`search-wrap tl-search${searchOpen ? ' open' : ''}`}
+                >
+                  <SearchIcon />
+                  <input
+                    ref={searchRef}
+                    type="search"
+                    className="soft-in"
+                    placeholder="Search past logs…"
+                    aria-label="Search past logs"
+                    value={query}
+                    onChange={(e) => setQuery(e.target.value)}
+                  />
                 </div>
 
-                <div className="select-box">
-                  <select aria-label="Filter logs by outcome" value={kind} onChange={(e) => setKind(e.target.value)}>
-                    <option value="all">All points</option>
-                    <option value="idea">Became ideas</option>
-                    <option value="task">Became tasks</option>
-                    <option value="open">Still open</option>
-                  </select>
-                  <ChevronDownIcon />
+                <div className="idea-filters tl-filters">
+                  <div className="select-box">
+                    <select aria-label="Filter logs by date" value={period} onChange={(e) => setPeriod(e.target.value)}>
+                      <option value="all">Any date</option>
+                      <option value="0">Today</option>
+                      <option value="7">Last 7 days</option>
+                      <option value="30">Last 30 days</option>
+                      <option value="90">Last 3 months</option>
+                    </select>
+                    <ChevronDownIcon />
+                  </div>
+
+                  <div className="select-box">
+                    <select aria-label="Filter logs by outcome" value={kind} onChange={(e) => setKind(e.target.value)}>
+                      <option value="all">All points</option>
+                      <option value="idea">Became ideas</option>
+                      <option value="task">Became tasks</option>
+                      <option value="open">Still open</option>
+                    </select>
+                    <ChevronDownIcon />
+                  </div>
                 </div>
               </div>
             </>

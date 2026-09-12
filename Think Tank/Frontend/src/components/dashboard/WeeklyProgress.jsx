@@ -1,5 +1,4 @@
 import { useEffect, useMemo, useState } from 'react';
-import DateRangePicker from './DateRangePicker';
 import { useApp } from '../../store/AppContext';
 import { TODAY, DAYS, ymd, startOfWeek, addDays, fmtShort } from '../../lib/date';
 
@@ -21,7 +20,17 @@ const pctOf = (rows) => {
   return { done, total, pct: total ? Math.round((done / total) * 100) : 0 };
 };
 
-export default function WeeklyProgress({ range, onRangeChange }) {
+/**
+ * The week's progress.
+ *
+ * The date picker used to live in this card's top-right corner, which left
+ * the percentage sitting alone under it with a column of empty card beside
+ * it. The picker belongs to the whole dashboard, not to this one card, so it
+ * has moved up to the page heading — opposite "Dashboard" — and the room it
+ * leaves behind is now doing work: the percentage reads on the title's own
+ * line, and the three counts sit where the picker was.
+ */
+export default function WeeklyProgress() {
   const { myTasks } = useApp();
 
   // Bars start at 0 and grow on the next frame so the CSS height transition runs.
@@ -47,27 +56,28 @@ export default function WeeklyProgress({ range, onRangeChange }) {
 
   return (
     <div className="card">
-      <div className="card-head">
-        <div>
+      <div className="card-head wp-head">
+        <div className="wp-title">
           <h2>Weekly Task Progress</h2>
           <span className="sub">{fmtShort(sow)} – {fmtShort(addDays(sow, 6))}</span>
         </div>
-        <div className="right range-holder">
-          <DateRangePicker value={range} onApply={onRangeChange} />
+        {/* Beside the title, not under it — the number and the thing it is a
+            number of belong on one line. */}
+        <div className="big-pct inline">{pct}%</div>
+        <div className="right">
+          <div className="pct-chips">
+            <span className="chip">{total} total</span>
+            <span className="chip green">{done} done</span>
+            <span className="chip amber">{total - done} remaining</span>
+          </div>
         </div>
       </div>
 
       <div className="card-body" style={{ paddingTop: 0 }}>
-        <div className="big-pct">{pct}%</div>
         <div className="pct-line">
           <span>This Week</span>
           <span className={`delta${delta < 0 ? ' down' : ''}`}>{delta >= 0 ? '+' : ''}{delta}%</span>
           <span>· {done} of {total} tasks completed</span>
-        </div>
-        <div className="pct-chips">
-          <span className="chip">{total} total</span>
-          <span className="chip green">{done} done</span>
-          <span className="chip amber">{total - done} remaining</span>
         </div>
 
         <div className="chart">

@@ -6,8 +6,9 @@ import BackLink from '../components/layout/BackLink';
 import Select from '../components/ui/Select';
 import { IdeaPager } from '../components/ui/Pager';
 import { MemberAvatar } from '../lib/avatars';
-import { displayName } from '../lib/format';
+import { displayName, isChairRecord } from '../lib/format';
 import { PlusIcon, SearchIcon, CloseIcon, ChevronDownIcon } from '../lib/icons';
+import useCompact from '../lib/useCompact';
 import { ALL_DEPARTMENTS } from '../data/seed';
 import { useApp } from '../store/AppContext';
 import { useAuth } from '../store/AuthContext';
@@ -20,6 +21,7 @@ export default function Team() {
   const { team, addMember, updateMember, removeMember } = useApp();
   const { user, isChair } = useAuth();
   const toast = useToast();
+  const compact = useCompact();
 
   const [inviteOpen, setInviteOpen] = useState(false);
   const [editing, setEditing] = useState(null);
@@ -34,16 +36,22 @@ export default function Team() {
   const set = (key, value) => setF((prev) => ({ ...prev, [key]: value }));
   useEffect(() => { setPage(1); }, [f]);
 
+  /* The chairman is not a team member on this page. He signs in, adds people
+     and edits roles exactly as before — he simply is not one of the rows, and
+     the count does not count him. Everything else about his account is
+     untouched; this is a display rule, not a permission one. */
+  const staff = useMemo(() => team.filter((m) => !isChairRecord(m)), [team]);
+
   /* Job titles come from the data, not a fixed list, so a title invented
      when someone is added is filterable straight away. */
   const roles = useMemo(
-    () => Array.from(new Set(team.map((m) => m.role).filter(Boolean))).sort(),
-    [team]
+    () => Array.from(new Set(staff.map((m) => m.role).filter(Boolean))).sort(),
+    [staff]
   );
 
   const rows = useMemo(() => {
     const q = f.query.trim().toLowerCase();
-    const matched = team.filter((m) => {
+    const matched = staff.filter((m) => {
       if (f.dept && m.dept !== f.dept) return false;
       if (f.role && m.role !== f.role) return false;
       if (!q) return true;
@@ -56,7 +64,7 @@ export default function Team() {
       role: (a, b) => a.role.localeCompare(b.role) || a.name.localeCompare(b.name),
     };
     return matched.sort(sorters[f.sort] || sorters.name);
-  }, [team, f]);
+  }, [staff, f]);
 
   const pages = Math.max(1, Math.ceil(rows.length / PER_PAGE));
   const current = Math.min(page, pages);
@@ -64,24 +72,23 @@ export default function Team() {
 
   return (
     <>
-      <BackLink to="/" label="Back to Dashboard" />
+      {!compact && <BackLink to="/" label="Back to Dashboard" />}
 
-      <div className={`sec-head${searchOpen ? ' searching' : ''}`}>
+      <div className={`sec-head${!compact && searchOpen ? ' searching' : ''}`}>
+        {compact && <BackLink to="/" label="Back to Dashboard" />}
         <div className="sh-txt">
           <h2>Team Members</h2>
-          <p>
-            {rows.length} member{rows.length === 1 ? '' : 's'}
-            {rows.length !== team.length && ` of ${team.length}`}
-          </p>
         </div>
 
-        {/* The field itself, on the heading's own line. */}
-        {searchOpen && (
-          <div className="search-box head-search">
+        {/* Phone and tablet: the field itself, on the heading's own line and
+            always there — see Ideas.jsx. Laptop: it folds behind the icon and
+            the filter row carries the real field. */}
+        {(compact || searchOpen) && (
+          <div className={`search-box head-search${compact ? ' always' : ''}`}>
             <SearchIcon />
             <input
               type="search"
-              autoFocus
+              autoFocus={!compact}
               placeholder="Search team members"
               aria-label="Search team members"
               value={f.query}
@@ -98,18 +105,20 @@ export default function Team() {
           </button>
         )}
 
-        <button
-          type="button"
-          className={`hs-btn${searchOpen ? ' on' : ''}`}
-          aria-label={searchOpen ? 'Close search' : 'Search team members'}
-          aria-expanded={searchOpen}
-          onClick={() => {
-            if (searchOpen) set('query', '');
-            setSearchOpen((v) => !v);
-          }}
-        >
-          {searchOpen ? <CloseIcon /> : <SearchIcon />}
-        </button>
+        {!compact && (
+          <button
+            type="button"
+            className={`hs-btn${searchOpen ? ' on' : ''}`}
+            aria-label={searchOpen ? 'Close search' : 'Search team members'}
+            aria-expanded={searchOpen}
+            onClick={() => {
+              if (searchOpen) set('query', '');
+              setSearchOpen((v) => !v);
+            }}
+          >
+            {searchOpen ? <CloseIcon /> : <SearchIcon />}
+          </button>
+        )}
       </div>
 
       <div className="idea-filters">

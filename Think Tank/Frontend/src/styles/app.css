@@ -1,3 +1,4 @@
+
 /* React-only additions on top of the ported global.css.
    Everything here exists because a markup element changed type
    (nav buttons became <a>) or because a screen is new (login). */
@@ -554,4 +555,425 @@ a.nav-item > span:first-of-type {
 @media (max-width: 1279px) {
   .tt-select .tt-select-btn { font-size: 12.5px; padding-block: 7px; }
   .tt-select-opt { font-size: 12.5px; padding-block: 7px; }
+}
+
+/* =====================================================================
+   September 2026 — second pass
+   ---------------------------------------------------------------------
+   Five things, in the order they were asked for:
+     15 · the back arrow, heavier and larger
+     16 · every filter row in one panel with a shadow under it
+     17 · Think Log's two filters side by side inside that panel
+     18 · the weekly card rebuilt around the space the picker left
+     19 · nothing wider than the screen it is on
+   ===================================================================== */
+
+/* --- 15 · the back arrow --------------------------------------------
+   Same arrow on Ideas, Task Overview, Team Members, Think Log and
+   Notifications, for the chairman and for everybody else — they all render
+   the one BackLink, so there is one rule here rather than five.
+
+   Bigger in two senses: a 42px target, which is what a thumb actually
+   needs, and a 24px glyph inside it. The stroke is set here rather than on
+   the icon because CSS beats the presentation attribute the component
+   writes, so the labelled desktop button keeps its own lighter weight. */
+.back-link.back-arrow {
+  width: 42px;
+  height: 42px;
+  flex: 0 0 42px;
+  border-radius: 11px;
+  background: var(--blue-soft, #eff4ff);
+  margin: 0 10px 8px 0;
+}
+
+.back-link.back-arrow svg {
+  width: 24px;
+  height: 24px;
+  stroke-width: 3;
+}
+
+.back-link.back-arrow:hover { background: #dfe9ff; }
+.back-link.back-arrow:active { transform: translateY(1px); }
+
+/* The heading beside it is now shorter than the arrow is tall, so it is
+   centred against it rather than nudged down by a fixed amount. */
+.back-link.back-arrow + .sec-head .sh-txt h2,
+.back-link.back-arrow + .page-head .page-h { margin-top: 4px; }
+
+/* --- 16 · the filters, each in its own box --------------------------
+   Not one panel drawn around the group: each filter is its own white box
+   with its own shadow, sitting on the page background — which is the shape
+   in the picture, and the shape these controls already had on a laptop. The
+   search field is not one of them and is not inside anything; it keeps the
+   line above, on its own.
+
+   .filter-panel is now only a wrapper that holds a page's filter rows
+   together and spaces them. It draws nothing. */
+.filter-panel,
+.idea-filters:not(.tl-filters):not(.tasks-search) {
+  background: none;
+  border: 0;
+  padding: 0;
+  box-shadow: none;
+  margin-bottom: 16px;
+}
+
+/* The pill itself. On a laptop the shadow belongs to the <select>; on a
+   phone or tablet the app draws its own dropdown and the <select> is gone,
+   so the wrapper has to carry the white, the border and the shadow instead —
+   without them those filters were bare text on the page. */
+.select-box select,
+.filters .filter-pill select {
+  box-shadow: 0 3px 10px rgba(16, 26, 48, .10);
+}
+
+@media (max-width: 1279px) {
+  .select-box.tt-select {
+    background: var(--white, #fff);
+    border: 1px solid var(--border, #dbe2ef);
+    border-radius: 10px;
+    box-shadow: 0 3px 10px rgba(16, 26, 48, .10);
+  }
+
+  .select-box.tt-select:hover { border-color: var(--blue-line, #c7d8fb); }
+
+  .select-box.tt-select.open {
+    border-color: var(--blue-bright, #2563eb);
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, .12);
+  }
+}
+
+/* Rows inside the panel own no margins of their own — the panel's padding
+   is the spacing, and 8px separates one row from the next. */
+.filter-panel > * { margin: 0; }
+.filter-panel > * + * { margin-top: 8px; }
+.filter-panel > .filters,
+.filter-panel > .idea-filters { margin-bottom: 0; }
+.filter-panel > .idea-filters.tasks-search {
+  background: none;
+  border: 0;
+  border-radius: 0;
+  padding: 0;
+  box-shadow: none;
+}
+
+/* The field inside a panel spans it rather than stopping at 460px in the
+   middle of a laptop's filter row. */
+.filter-panel .search-box,
+.idea-filters:not(.tl-filters):not(.tasks-search) > .search-box {
+  flex: 1 1 auto;
+  max-width: none;
+  width: 100%;
+}
+
+/* Laptop — the selects in an even row instead of each one being as wide as
+   its longest option. That is what left them looking unarranged: five pills
+   of five different widths with the gaps falling wherever they fell. */
+@media (min-width: 1280px) {
+  .idea-filters:not(.tl-filters):not(.tasks-search) {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: 10px;
+    align-items: center;
+  }
+  .idea-filters:not(.tl-filters):not(.tasks-search) > .search-box { grid-column: 1 / -1; }
+  .idea-filters:not(.tl-filters):not(.tasks-search) > .select-box {
+    display: block;
+    width: 100%;
+    min-width: 0;
+  }
+  .idea-filters:not(.tl-filters):not(.tasks-search) > .select-box select {
+    width: 100%;
+    min-width: 0;
+    text-overflow: ellipsis;
+  }
+
+  .filter-panel > .filters {
+    display: grid;
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    gap: 10px;
+  }
+  .filter-panel > .filters > .select-box,
+  .filter-panel > .filters > .filter-pill {
+    display: block;
+    width: 100%;
+    min-width: 0;
+    margin: 0;
+  }
+  .filter-panel > .filters > .select-box select,
+  .filter-panel > .filters > .filter-pill select {
+    width: 100%;
+    min-width: 0;
+    text-overflow: ellipsis;
+  }
+}
+
+/* Phone and tablet: as many to a line as the panel can hold, each an equal
+   share of it — two on a phone, four or five on a tablet. Sized as a count
+   instead, a tablet got two half-width controls with a channel of empty pill
+   between each label and its chevron; sized with a cap, the row stopped
+   short and left the right-hand third of the panel blank. */
+@media (max-width: 1279px) {
+  .filter-panel > .filters {
+    margin-bottom: 0;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    gap: 8px;
+  }
+  .filter-panel > .filters > .select-box,
+  .filter-panel > .filters > .filter-pill {
+    display: block;
+    width: 100%;
+    min-width: 0;
+    margin: 0;
+  }
+
+  .idea-filters:not(.tl-filters):not(.tasks-search) {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 8px;
+  }
+  .idea-filters:not(.tl-filters):not(.tasks-search) > .search-box {
+    grid-column: 1 / -1;
+    max-width: none;
+  }
+  .idea-filters:not(.tl-filters):not(.tasks-search) > .select-box,
+  .idea-filters:not(.tl-filters):not(.tasks-search) > .select-box.wide {
+    display: block;
+    width: 100%;
+    min-width: 0;
+    grid-column: auto;
+  }
+}
+
+/* --- 17 · Think Log — "Any date" and "All points", side by side ------
+   They were stacked in a narrow column at the right, one above the other,
+   with the field taking the rest of the row. Now the field has the top line
+   of the panel to itself and the two filters share the line below it, half
+   each, at every width. */
+.tl-panel .tl-search {
+  width: 100%;
+  margin: 0;
+}
+
+.tl-panel .tl-search.open { display: flex; }
+.tl-panel .tl-search .soft-in { width: 100%; min-width: 0; }
+
+.tl-panel > .tl-filters {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+  flex-wrap: nowrap;
+}
+
+.tl-panel > .tl-filters .select-box,
+.tl-panel > .tl-filters .tt-select {
+  display: block;
+  width: 100%;
+  min-width: 0;
+  flex: none;
+}
+
+.tl-panel > .tl-filters .select-box select { width: 100%; min-width: 0; }
+
+/* --- 18 · Weekly Task Progress ---------------------------------------
+   The picker has gone up to the page heading, opposite "Dashboard". What it
+   used to occupy is now the three counts, and the percentage has come up on
+   to the title's line — which is what closes the tall empty gap that used
+   to sit under it. */
+.page-head .page-actions .range-btn,
+.page-head .page-actions { padding-top: 0; }
+
+.wp-head {
+  align-items: center;
+  row-gap: 8px;
+}
+
+.wp-head .wp-title { min-width: 0; }
+
+.wp-head .big-pct.inline {
+  font-size: 30px;
+  letter-spacing: -1px;
+  line-height: 1;
+  flex: 0 0 auto;
+  /* Beside the title, not welded to it — and lifted so it reads against the
+     title itself rather than against the date range under it. */
+  margin: 0 0 4px 10px;
+  align-self: center;
+}
+
+.wp-head .right { margin-left: auto; }
+.wp-head .pct-chips { margin-top: 0; justify-content: flex-end; }
+
+/* A phone has no room for three things on one line: title and percentage
+   share the first, the counts take the second. */
+@media (max-width: 640px) {
+  .wp-head { flex-wrap: wrap; gap: 10px; }
+  .wp-head .wp-title { flex: 1 1 auto; }
+  .wp-head .big-pct.inline { font-size: 26px; }
+  .wp-head .right { flex: 1 1 100%; margin-left: 0; }
+  .wp-head .pct-chips { justify-content: flex-start; }
+}
+
+/* --- 19 · nothing wider than the screen ------------------------------
+   Every complaint about a page "not fitting" came from one of three things:
+   a grid track with a floor wider than the phone, a control that refused to
+   shrink below its longest option, or a table outside a scroller. The first
+   two are fixed above; this is the backstop for anything left. */
+@media (max-width: 1279px) {
+  .content,
+  .panel,
+  .shell { min-width: 0; max-width: 100%; }
+
+  .content > *,
+  .panel > * { max-width: 100%; }
+
+  .card,
+  .tl-card,
+  .filter-panel,
+  .statcards,
+  .stats { min-width: 0; max-width: 100%; }
+
+  .table-wrap,
+  .bt-wrap { max-width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; }
+
+  /* A select must be allowed to be narrower than its longest option, or it
+     pushes the row it is in off the side of the screen. */
+  .select-box,
+  .tt-select,
+  .filter-pill { min-width: 0; max-width: 100%; }
+  .select-box select { max-width: 100%; }
+
+  /* Long words — an email, a department nobody abbreviated — break rather
+     than stretch the column they are in. */
+  .sec-head h2,
+  .page-h,
+  .td-title,
+  .t-name,
+  .nf-b strong { overflow-wrap: anywhere; }
+}
+
+/* The dashboard's date picker keeps the heading's own line at every width.
+   .page-actions goes full-width under the title on a phone, which is right
+   for a "Create New Idea" button and wrong for this — the picker is a small
+   control that belongs opposite the word "Dashboard", which is exactly where
+   it was asked to be. */
+.page-head.with-range { align-items: center; flex-wrap: nowrap; gap: 12px; }
+.page-head.with-range .ph-txt { flex: 1 1 auto; min-width: 0; }
+
+.page-head.with-range .page-actions {
+  margin-left: auto;
+  margin-bottom: 0;
+  padding-top: 0;
+  width: auto;
+  flex: 0 0 auto;
+}
+
+.page-head.with-range .page-actions .range { display: inline-block; }
+
+/* With the line under the heading gone, the Notifications header is three
+   controls on one row and a phone is 390px wide. The row stays a row: the
+   heading gives up width first, and "Mark all as read" is sized to what it
+   says rather than to the button it was inheriting. */
+@media (max-width: 640px) {
+  .sec-head { flex-wrap: nowrap; }
+  .sec-head .sh-txt { flex: 1 1 0; min-width: 0; }
+  .sec-head .sh-txt h2 { overflow: hidden; text-overflow: ellipsis; }
+  .sec-head .btn-mark {
+    flex: 0 0 auto;
+    font-size: 12px;
+    padding: 7px 10px;
+    white-space: nowrap;
+  }
+  .sec-head .hs-btn { flex: 0 0 auto; }
+}
+
+/* The back arrow is floated so the heading can sit on its line without
+   rewriting seven page files. A float 50px tall outlives a one-line heading,
+   though, and the next block was being indented by the width of it — which
+   is why the filter panel on Team Members started 50px in from the cards
+   under it. Everything after the heading starts at the left margin again. */
+.filter-panel,
+.idea-filters,
+.nf-tabs,
+.card,
+.tl-card,
+.swipe-hint,
+.pager,
+.empty { clear: both; }
+
+/* --- 20 · one search per page, in the same place on all five ---------
+   Ideas, Team Members and Notifications used to fold their field behind a
+   magnifier while Task Overview showed its own straight away, so the same
+   control lived in two different places depending on which page you were
+   on. All five now put the field at the top right of the heading on a phone
+   or tablet — which means the copy in the filter row below is the second
+   one, and goes. The laptop is untouched: the magnifier there opens a field
+   over the heading and the filter row keeps the real one. */
+@media (max-width: 1279px) {
+  .idea-filters > .search-box { display: none; }
+
+  .sec-head .head-search.always,
+  .page-head .head-search.always {
+    display: flex;
+    flex: 0 1 210px;
+    min-width: 130px;
+    max-width: 210px;
+    margin-left: auto;
+    border-radius: 10px;
+  }
+
+  .sec-head .head-search.always input,
+  .page-head .head-search.always input {
+    font-size: 12.5px;
+    padding-block: 7px;
+    min-width: 0;
+    box-shadow: 0 3px 10px rgba(16, 26, 48, .10);
+  }
+
+  /* Team Members has "Add Member" on that line too, so on a phone the field
+     takes the row under the heading rather than squeezing all three in. */
+  .sec-head { flex-wrap: wrap; row-gap: 8px; }
+}
+
+@media (max-width: 640px) {
+  .sec-head .head-search.always,
+  .page-head .head-search.always { flex: 1 1 100%; max-width: none; margin-left: 0; }
+  .sec-head .btn-add { order: 2; }
+  .sec-head .head-search.always { order: 3; }
+}
+
+/* --- 21 · the arrow is part of the heading row now -------------------
+   It used to be floated from outside the heading block, which put the whole
+   block beside the float — so anything that wrapped to a second line inside
+   it (the search field) started 50px in from the cards underneath. It is now
+   the first item on the heading's own row, so the rest of the block has the
+   full width of the page. */
+.sec-head > .back-link.back-arrow,
+.page-head > .back-link.back-arrow {
+  float: none;
+  margin: 0;
+  align-self: flex-start;
+}
+
+@media (max-width: 1279px) {
+  .sec-head,
+  .page-head { align-items: center; }
+
+  .sec-head > .back-link.back-arrow,
+  .page-head > .back-link.back-arrow { align-self: center; }
+
+  /* The heading takes what is left of the row and gives it up first. */
+  .sec-head > .sh-txt,
+  .page-head > .ph-txt { flex: 1 1 120px; min-width: 0; }
+}
+
+/* Phone: heading and arrow on line one, the field on line two — full width
+   now that nothing is floated beside it. */
+@media (max-width: 640px) {
+  .sec-head > .sh-txt,
+  .page-head > .ph-txt { flex: 1 1 auto; }
+  .sec-head .head-search.always,
+  .page-head .head-search.always { order: 5; }
+  .page-head .page-actions { order: 4; }
 }

@@ -2,6 +2,7 @@ import { useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import PageHead from '../components/layout/PageHead';
 import WeeklyProgress from '../components/dashboard/WeeklyProgress';
+import DateRangePicker from '../components/dashboard/DateRangePicker';
 import TaskViewModal from '../components/tasks/TaskViewModal';
 import { useApp } from '../store/AppContext';
 import { useAuth } from '../store/AuthContext';
@@ -72,10 +73,15 @@ export default function Dashboard() {
 
   return (
     <>
+      {/* The date picker is the whole page's control — every card on the
+          dashboard reads the range it sets — so it sits opposite the page
+          heading rather than inside one card's corner. */}
       <PageHead
+        className="with-range"
         title="Dashboard"
         subtitle={`Welcome back, ${isChair ? 'Chairman' : 'there'}`}
         hideSubtitleOnMobile
+        action={<DateRangePicker value={range} onApply={applyRange} />}
       />
 
       {/* The tone class carries the card's colour to the number, which is what
@@ -110,7 +116,7 @@ export default function Dashboard() {
         </div>
       </div>
 
-      <WeeklyProgress range={range} onRangeChange={applyRange} />
+      <WeeklyProgress />
 
       {/* ---------- Recent Ideas ---------- */}
       <div className="card">

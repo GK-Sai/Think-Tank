@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import Modal from '../ui/Modal';
 import { useApp } from '../../store/AppContext';
+import useCompact from '../../lib/useCompact';
 import { calClass, effStatus } from '../../lib/format';
 import { SearchIcon, ChevronDownIcon } from '../../lib/icons';
 import {
@@ -88,9 +89,10 @@ function AgendaRow({ task, onView }) {
 
 const BLANK = { query: '', status: 'all', priority: 'all' };
 
-export default function MyTasksCalendar({ onViewTask }) {
+export default function MyTasksCalendar({ onViewTask, back = null }) {
   const { myTasks } = useApp();
   const isPhone = useIsPhone();
+  const compact = useCompact();
   /* The month is what you want first: where the work sits across the weeks.
      Day and Week are the zoom-ins, one tap away. */
   const [view, setView] = useState('month');
@@ -215,31 +217,42 @@ export default function MyTasksCalendar({ onViewTask }) {
   return (
     <>
       <div className="sec-head mt-head">
-        <div>
+        {back}
+        <div className="sh-txt">
           <h2>My Tasks</h2>
-          <p>
-            {visible.length} task{visible.length === 1 ? '' : 's'}
-            {visible.length !== myTasks.length && ` of ${myTasks.length}`} on your calendar
-          </p>
         </div>
-        {/* Mobile-only: a collapsed search icon at the top-right of the
-            section header, next to the title. Hidden on desktop, where the
-            full search field below stays as it was. */}
-        <button
-          type="button"
-          className={`mt-search-btn${searchOpen ? ' on' : ''}`}
-          aria-expanded={searchOpen}
-          aria-controls="myTaskSearch"
-          aria-label={searchOpen ? 'Hide task search' : 'Search my tasks'}
-          title="Search my tasks"
-          onClick={() => {
-            const next = !searchOpen;
-            setSearchOpen(next);
-            if (!next) setFilter('query', '');
-          }}
-        >
-          <SearchIcon />
-        </button>
+        {/* Phone and tablet: the field itself, top right of the heading —
+            the same place and the same shape as on the other five pages, so
+            a member moving between them is not hunting for it. Laptop: the
+            magnifier, with the real field in the filter row below. */}
+        {compact ? (
+          <div className="search-box head-search always">
+            <SearchIcon />
+            <input
+              type="search"
+              placeholder="Search my tasks"
+              aria-label="Search my tasks"
+              value={filters.query}
+              onChange={(e) => setFilter('query', e.target.value)}
+            />
+          </div>
+        ) : (
+          <button
+            type="button"
+            className={`mt-search-btn${searchOpen ? ' on' : ''}`}
+            aria-expanded={searchOpen}
+            aria-controls="myTaskSearch"
+            aria-label={searchOpen ? 'Hide task search' : 'Search my tasks'}
+            title="Search my tasks"
+            onClick={() => {
+              const next = !searchOpen;
+              setSearchOpen(next);
+              if (!next) setFilter('query', '');
+            }}
+          >
+            <SearchIcon />
+          </button>
+        )}
       </div>
 
       <div className="idea-filters mt-filters">

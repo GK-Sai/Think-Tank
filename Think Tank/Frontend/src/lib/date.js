@@ -19,12 +19,23 @@ export const MONTHS = [
 export const DAYS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
 export const DAYS_FULL = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
 
-/** Local midnight for today. Computed once so every comparison agrees. */
-export const TODAY = (() => {
+/**
+ * Local midnight for *right now*.
+ *
+ * TODAY below is the same thing frozen at page load, which is what every
+ * calendar grid and due-date sum wants — they must not shift under the
+ * reader mid-render. A clock label is the opposite case: "Today, 11:05 AM"
+ * has to still say the truth on a tab that has been open since yesterday
+ * evening, so anything that prints a time asks this instead.
+ */
+export const todayStart = () => {
   const t = new Date();
   t.setHours(0, 0, 0, 0);
   return t;
-})();
+};
+
+/** Local midnight for today. Computed once so every comparison agrees. */
+export const TODAY = todayStart();
 
 export const ymd = (d) =>
   `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
@@ -124,11 +135,19 @@ export const fmtDateTime = (value) => {
   return `${MONTHS[d.getMonth()].slice(0, 3)} ${d.getDate()}, ${d.getFullYear()} · ${fmtTime(d)}`;
 };
 
-/** 'Today, 10:04 AM' / 'Yesterday, 5:40 PM' / '24 Aug 2026 · 11:00 AM'. */
+/**
+ * 'Today, 11:05 AM' / 'Yesterday, 5:40 PM' / '24 Aug 2026 · 11:00 AM'.
+ *
+ * The hour printed is the one the reader's own clock would have shown at
+ * that instant, and "Today" is worked out against the clock as it is when
+ * the line is drawn — not against a midnight captured when the tab was first
+ * opened, which is how a notification raised this morning could still be
+ * filed under "Yesterday" on a screen nobody had reloaded.
+ */
 export const fmtWhen = (value) => {
   const d = toDate(value);
   if (Number.isNaN(d.getTime())) return '';
-  const diff = daysBetween(parseYmd(d), TODAY);
+  const diff = daysBetween(parseYmd(d), todayStart());
   if (diff === 0) return `Today, ${fmtTime(d)}`;
   if (diff === 1) return `Yesterday, ${fmtTime(d)}`;
   return fmtDateTime(d);
@@ -165,9 +184,11 @@ export const stampOffset = (n, hours = 9, minutes = 0) => {
   return new Date(Date.now() - minutesBack * 60000).toISOString();
 };
 
-/** Which heading a notification or log sits under. */
+/** Which heading a notification or log sits under. Against the live clock,
+    for the same reason fmtWhen is — the headings and the times under them
+    must not disagree about what day it is. */
 export const bucketOf = (value) => {
-  const diff = daysBetween(parseYmd(value), TODAY);
+  const diff = daysBetween(parseYmd(value), todayStart());
   if (diff <= 0) return 'today';
   if (diff === 1) return 'yesterday';
   return 'earlier';
