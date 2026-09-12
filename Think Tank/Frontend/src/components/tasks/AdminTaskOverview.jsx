@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import Pager from '../ui/Pager';
 import Select from '../ui/Select';
+import useCompact from '../../lib/useCompact';
 import { useApp } from '../../store/AppContext';
 import { TODAY, parseYmd, daysBetween } from '../../lib/date';
 import { effStatus, displayName } from '../../lib/format';
@@ -36,10 +37,11 @@ const BLANK = { query: '', range: 'all', status: 'all', member: 'all', dept: 'al
 
 export default function AdminTaskOverview({ onViewTask }) {
   const { tasks, team } = useApp();
+  const compact = useCompact();
   const [filters, setFilters] = useState(BLANK);
   const [page, setPage] = useState(1);
-  /* Phone only: the search field folds behind the icon at the right of the
-     heading — the same pattern Ideas, Team and Notifications use. */
+  /* Laptop only: the field folds behind the icon at the right of the heading.
+     On a phone or tablet it is simply there — see below. */
   const [searchOpen, setSearchOpen] = useState(false);
 
   const setFilter = (key, value) => {
@@ -102,9 +104,29 @@ export default function AdminTaskOverview({ onViewTask }) {
   const current = Math.min(page, pages);
   const slice = rows.slice((current - 1) * PER_PAGE, current * PER_PAGE);
 
+  /* The four counts. On a phone or tablet they come first — the numbers the
+     page exists to show should not come second to the controls that narrow
+     them. On a laptop they stay where they always were, under the filter
+     bar. */
+  const statCards = (
+    <div className="statcards">
+      {CARDS.map((c) => (
+        <button
+          key={c.key}
+          type="button"
+          className={`statcard ${c.cls}${filters.status === c.key ? ' on' : ''}`}
+          onClick={() => setFilter('status', c.key)}
+        >
+          <span className="lab">{c.label}</span>
+          <span className="num">{counts[c.key]}</span>
+        </button>
+      ))}
+    </div>
+  );
+
   return (
     <>
-      <div className={`sec-head${searchOpen ? ' searching' : ''}`}>
+      <div className={`sec-head${!compact && searchOpen ? ' searching' : ''}`}>
         <div className="sh-txt">
           <h2>Admin Task Overview</h2>
           <p>
@@ -113,16 +135,20 @@ export default function AdminTaskOverview({ onViewTask }) {
           </p>
         </div>
 
-        {/* Phone only — the same fold-away field Ideas, Team and Notifications
-            use. The field in the filter bar below is hidden on a phone, so
-            without this the chairman had no way to search his own task board
-            on the device he is most likely reading it on. */}
-        {searchOpen && (
-          <div className="search-box head-search">
+        {/* Phone and tablet: the field itself, top right of the heading. It
+            used to fold away behind a magnifier, and a chairman looking for
+            the search bar on his tablet did not find one — a hidden control
+            is the same as no control. The field in the filter bar below is
+            hidden at these widths, so this is the one search on the page.
+
+            Laptop: untouched. The button is hidden there by the app's own
+            CSS, and the filter bar carries the field, exactly as before. */}
+        {(compact || searchOpen) && (
+          <div className={`search-box head-search${compact ? ' always' : ''}`}>
             <SearchIcon />
             <input
               type="search"
-              autoFocus
+              autoFocus={!compact}
               placeholder="Search tasks"
               aria-label="Search tasks"
               value={filters.query}
@@ -134,39 +160,28 @@ export default function AdminTaskOverview({ onViewTask }) {
           </div>
         )}
 
-        <button
-          type="button"
-          className={`hs-btn${searchOpen ? ' on' : ''}`}
-          aria-label={searchOpen ? 'Close search' : 'Search tasks'}
-          aria-expanded={searchOpen}
-          onClick={() => {
-            if (searchOpen) setFilter('query', '');
-            setSearchOpen((v) => !v);
-          }}
-        >
-          {searchOpen ? <CloseIcon /> : <SearchIcon />}
-        </button>
-      </div>
-
-      {/* The four counts, in one block and always in this order: the whole,
-          then the two that need attention, then the one that does not. They
-          used to be printed below the filter bar, so the numbers the page
-          exists to show came second to the controls that narrow them. */}
-      <div className="statcards">
-        {CARDS.map((c) => (
+        {!compact && (
           <button
-            key={c.key}
             type="button"
-            className={`statcard ${c.cls}${filters.status === c.key ? ' on' : ''}`}
-            onClick={() => setFilter('status', c.key)}
+            className={`hs-btn${searchOpen ? ' on' : ''}`}
+            aria-label={searchOpen ? 'Close search' : 'Search tasks'}
+            aria-expanded={searchOpen}
+            onClick={() => {
+              if (searchOpen) setFilter('query', '');
+              setSearchOpen((v) => !v);
+            }}
           >
-            <span className="lab">{c.label}</span>
-            <span className="num">{counts[c.key]}</span>
+            {searchOpen ? <CloseIcon /> : <SearchIcon />}
           </button>
-        ))}
+        )}
       </div>
 
-      <div className="idea-filters">
+      {compact && statCards}
+
+      {/* Laptop only. On a phone or tablet the field is in the heading above
+          — see the note there — and this row is hidden rather than showing
+          the same search twice. */}
+      <div className="idea-filters tasks-search">
         <div className="search-box">
           <SearchIcon />
           <input
@@ -231,6 +246,9 @@ export default function AdminTaskOverview({ onViewTask }) {
           ]}
         />
       </div>
+
+      {/* Laptop: the stat cards double as the status filter, under the bar. */}
+      {!compact && statCards}
 
       <p className="swipe-hint">Swipe the table sideways to see all columns</p>
       <div className="bt-wrap">

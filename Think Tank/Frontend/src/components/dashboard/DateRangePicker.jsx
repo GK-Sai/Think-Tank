@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { CalendarIcon, ChevronDownIcon } from '../../lib/icons';
+import useCompact from '../../lib/useCompact';
 import { TODAY, ymd, parseYmd, addDays, startOfWeek, fmtShort, fmtLong } from '../../lib/date';
 
 const OPTIONS = [
@@ -43,6 +44,7 @@ export function rangeBounds(key, fromValue, toValue) {
 }
 
 export default function DateRangePicker({ value, onApply }) {
+  const compact = useCompact();
   const [open, setOpen] = useState(false);
   const [pending, setPending] = useState(value.key);
   const [from, setFrom] = useState(ymd(TODAY));
@@ -89,7 +91,9 @@ export default function DateRangePicker({ value, onApply }) {
    */
   const choose = (key) => {
     setPending(key);
-    if (key !== 'custom') applyKey(key);
+    /* Phone and tablet only. On a laptop the menu behaves as it always did:
+       pick, then Apply. */
+    if (compact && key !== 'custom') applyKey(key);
   };
 
   const triggerLabel = value.key === 'today' ? fmtLong(TODAY) : value.label;
@@ -130,8 +134,9 @@ export default function DateRangePicker({ value, onApply }) {
           <label>To<input type="date" value={to} onChange={(e) => setTo(e.target.value)} /></label>
         </div>
 
-        {/* Only the custom range needs confirming — see `choose` above. */}
-        {pending === 'custom' && (
+        {/* On a phone only the custom range needs confirming — see `choose`.
+            On a laptop every choice does, as before. */}
+        {(!compact || pending === 'custom') && (
           <div className="range-actions">
             <button type="button" className="btn-cancel" onClick={() => setOpen(false)}>Cancel</button>
             <button type="button" className="btn-apply" onClick={apply}>Apply</button>

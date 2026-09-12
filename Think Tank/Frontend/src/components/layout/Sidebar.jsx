@@ -4,6 +4,7 @@ import {
   ChevronLeftIcon, ChevronRightIcon,
 } from '../../lib/icons';
 import { useAuth } from '../../store/AuthContext';
+import useCompact from '../../lib/useCompact';
 import { useApp } from '../../store/AppContext';
 import { useToast } from '../../store/ToastContext';
 
@@ -20,6 +21,7 @@ import { useToast } from '../../store/ToastContext';
  */
 export default function Sidebar({ open, collapsed, onToggleCollapsed, onNavigate }) {
   const { isChair, signOut } = useAuth();
+  const compact = useCompact();
   const { unreadCount } = useApp();
   const toast = useToast();
   const navigate = useNavigate();
@@ -76,12 +78,21 @@ export default function Sidebar({ open, collapsed, onToggleCollapsed, onNavigate
 
       <span className="nav-spacer" />
 
-      {/* The icon sits after the label here, unlike every other nav item: this
-          one is a way out rather than a place to go, and an arrow pointing
-          away from the list reads as leaving it. */}
+      {/* On a phone the icon sits after the label and the arrow is mirrored by
+          CSS to point away from the list — a way out rather than a place to go.
+          On a laptop it is the original: icon first, as every other nav item. */}
       <button className="nav-item signout" onClick={handleSignOut} title="Sign Out">
-        <span>Sign Out</span>
-        <SignOutIcon />
+        {compact ? (
+          <>
+            <span>Sign Out</span>
+            <SignOutIcon />
+          </>
+        ) : (
+          <>
+            <SignOutIcon />
+            <span>Sign Out</span>
+          </>
+        )}
       </button>
     </aside>
   );

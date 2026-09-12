@@ -1,12 +1,14 @@
 import { useEffect, useState } from 'react';
 import Modal from '../ui/Modal';
 import DatePicker, { fmtDMY } from '../ui/DatePicker';
+import useCompact from '../../lib/useCompact';
 import { TODAY, ymd } from '../../lib/date';
 
 /** Chairman-only: the date an approved idea is meant to go live. */
 export default function ImplementationDateModal({ open, current, onClose, onSave }) {
   const [date, setDate] = useState(current || ymd(TODAY));
   const [saving, setSaving] = useState(false);
+  const compact = useCompact();
 
   useEffect(() => { if (open) setDate(current || ymd(TODAY)); }, [open, current]);
 
@@ -52,22 +54,38 @@ export default function ImplementationDateModal({ open, current, onClose, onSave
         </>
       }
     >
-      {/* Label and value at the same size — the label used to be set larger
-          than the date it labels, which read as the heading of the dialog
-          rather than the name of a field. */}
-      <div className="field-row impl-date-row">
-        <label htmlFor="implDate" className="impl-date-label">Implementation date</label>
-        <output className="impl-date-value" htmlFor="implDate">
-          {date ? fmtDMY(date) : 'Not set'}
-        </output>
-      </div>
+      {/* On a phone: label and value at one size, the date written the way it
+          is written here, and the app's own blue calendar — the device's
+          picker cannot be styled and looks different on every phone.
+          On a laptop: the field exactly as it was. */}
+      {compact ? (
+        <>
+          <div className="field-row impl-date-row">
+            <label htmlFor="implDate" className="impl-date-label">Implementation date</label>
+            <output className="impl-date-value" htmlFor="implDate">
+              {date ? fmtDMY(date) : 'Not set'}
+            </output>
+          </div>
 
-      <DatePicker
-        id="implDate"
-        value={date}
-        min={ymd(TODAY)}
-        onChange={setDate}
-      />
+          <DatePicker
+            id="implDate"
+            value={date}
+            min={ymd(TODAY)}
+            onChange={setDate}
+          />
+        </>
+      ) : (
+        <div className="field-row">
+          <label htmlFor="implDate">Implementation date</label>
+          <input
+            id="implDate"
+            type="date"
+            value={date}
+            min={ymd(TODAY)}
+            onChange={(e) => setDate(e.target.value)}
+          />
+        </div>
+      )}
       <p className="modal-hint">
         Setting a date on an idea still under review also marks it Approved.
       </p>

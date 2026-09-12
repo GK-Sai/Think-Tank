@@ -211,59 +211,125 @@ a.nav-item > span:first-of-type {
 .tt-cal-d.on { background: var(--brand, #1d4ed8); color: #fff; font-weight: 700; }
 .tt-cal-d:disabled { color: #c3cad8; cursor: default; }
 
-/* The custom range in the dashboard picker still uses native date inputs;
-   at least make their selected day blue rather than the OS accent. */
-.custom-range input[type="date"],
-input[type="date"] { accent-color: var(--brand, #1d4ed8); }
+/* The phone and tablet picker is the app's own now; where a native date input
+   is still used at these widths, at least make its selected day blue rather
+   than the OS accent. The laptop keeps the input it always had. */
+@media (max-width: 1279px) {
+  .custom-range input[type="date"],
+  input[type="date"] { accent-color: var(--brand, #1d4ed8); }
+}
 
-/* --- 03 · Think Log header ------------------------------------------
+/* --- 03 · Think Log header, phone and tablet -------------------------
    Row 1: heading left, Jump to Today hard right.
-   Row 2: search, full width.
-   Row 3: the two filters, one at each end. */
-.tl-head-row {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 10px;
-  margin-bottom: 10px;
+   Row 2: the search field with both filters beside it.
+
+   Nothing here applies to a laptop. The laptop renders the original
+   markup — .jump-row, the folded field, the filters on their own line —
+   which is why these rules are inside the media query rather than left
+   to override it. */
+@media (max-width: 1279px) {
+  .tl-head-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    margin-bottom: 10px;
+  }
+
+  .tl-head-row .tl-h3 { margin: 0; }
+
+  .tl-jump {
+    flex: 0 0 auto;
+    font-size: 12.5px;
+    padding: 7px 12px;
+    white-space: nowrap;
+  }
+
+  .tl-jump svg { width: 15px; height: 15px; }
+
+  /* One row: field, then the two things that narrow it. Stacked, the three
+     of them took three rows of a phone screen to control a list that had
+     four rows left to show. */
+  .tl-searchrow {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 10px;
+  }
+
+  .tl-searchrow .tl-search {
+    display: flex;
+    flex: 1 1 auto;
+    min-width: 0;
+    margin: 0;
+  }
+
+  .tl-searchrow .tl-search .soft-in { font-size: 12.5px; min-width: 0; }
+
+  /* The two filters keep a fixed share and the field takes what is left.
+     Sized as a proportion instead, each filter grew to a third of a tablet
+     and opened a channel of empty pill between its words and its chevron. */
+  .tl-searchrow .tl-filters {
+    display: flex;
+    flex: 0 1 auto;
+    gap: 8px;
+    min-width: 0;
+    margin: 0;
+  }
+
+  .tl-searchrow .tl-filters .select-box { flex: 0 1 116px; min-width: 92px; }
 }
 
-.tl-head-row .tl-h3 { margin: 0; }
+/* A phone has three controls to fit on one line and about 360px to do it
+   in, so everything on that row gives up whatever it can. */
+@media (max-width: 640px) {
+  .tl-searchrow { gap: 6px; }
+  .tl-searchrow > * { min-width: 0; }
+  .tl-searchrow .tl-search { flex: 1 1 60px; }
+  /* The magnifier is positioned against the field, so its offset and the
+     room the text leaves for it have to move together. */
+  .tl-searchrow .tl-search svg { left: 9px; width: 14px; height: 14px; }
+  .tl-searchrow .tl-search .soft-in {
+    width: 100%;
+    min-width: 0;
+    padding-left: 27px;
+    padding-right: 8px;
+  }
+  .tl-searchrow .tl-filters { flex: 0 1 auto; gap: 6px; }
+  .tl-searchrow .tl-filters .select-box { flex: 0 1 104px; min-width: 84px; }
+  .tl-searchrow .tt-select .tt-select-btn { padding-inline: 8px; gap: 4px; }
 
-.tl-jump {
-  flex: 0 0 auto;
-  font-size: 12.5px;
-  padding: 7px 12px;
-  white-space: nowrap;
+  .tl-filters .select-box { flex: 1 1 0; min-width: 0; }
+  .tl-filters .select-box select { width: 100%; }
 }
-
-.tl-jump svg { width: 15px; height: 15px; }
-
-/* The field no longer folds away behind an icon. */
-.tl-search { display: flex; margin-bottom: 8px; }
-.tl-search .soft-in { font-size: 13px; }
-.jump-row, .jump-search { display: none; }
-
-/* Two halves of one row, not two things pushed to opposite walls. Spacing
-   them apart left a channel of empty card between two controls that belong
-   together, and made each one look narrower than the field above it. */
-.tl-filters { display: flex; gap: 8px; }
-.tl-filters .select-box { flex: 1 1 0; min-width: 0; }
-.tl-filters .select-box select { width: 100%; }
 
 /* --- 04 · Task Overview search, small and top right ------------------
-   The tablet was falling between the two: too wide for the fold-away
-   button, too narrow for the full filter row. It now uses the same
-   folded field the phone does, all the way up to the desktop. */
+   The field is in the heading itself at these widths, not behind the
+   magnifier — a control nobody can find is a control nobody has. */
 @media (max-width: 1279px) {
-  .idea-filters .search-box { display: none; }
-  .sec-head .hs-btn { display: inline-grid; }
-  .sec-head .head-search { max-width: 220px; }
-  .sec-head .head-search input { font-size: 12.5px; padding-block: 6px; }
+  /* Only this page's row — Ideas, Team and Notifications share the
+     .idea-filters class and keep the field they have always had there. */
+  .idea-filters.tasks-search { display: none; }
+
+  .sec-head { align-items: flex-start; flex-wrap: wrap; gap: 8px; }
+  .sec-head .sh-txt { flex: 1 1 150px; min-width: 0; }
+
+  .sec-head .head-search.always {
+    display: flex;
+    flex: 0 1 210px;
+    min-width: 140px;
+    margin-left: auto;
+    max-width: 210px;
+    border-radius: 9px;
+  }
+
+  .sec-head .head-search input { font-size: 12.5px; padding-block: 6px; min-width: 0; }
 }
 
 /* --- 05 · the four counts, one block, one order ---------------------- */
-.statcards { margin-bottom: 12px; }
+@media (max-width: 1279px) {
+  .statcards { margin-bottom: 12px; }
+}
 
 @media (max-width: 1279px) {
   .statcards {
@@ -293,18 +359,37 @@ input[type="date"] { accent-color: var(--brand, #1d4ed8); }
     margin-bottom: 12px;
     overflow: visible;
   }
-  .filters .filter-pill { width: 100%; min-width: 0; margin: 0; }
-  .filters .filter-pill select {
+
+  /* A tablet is wide enough for four of them, and stretching two across it
+     was where the gap came from: each control was half the screen wide with
+     its words at one end and its chevron at the other. Capped, they sit in
+     a row and each one is only as wide as it needs to be. */
+  @media (min-width: 641px) {
+    .filters {
+      grid-template-columns: repeat(auto-fill, minmax(150px, 190px));
+      justify-content: start;
+    }
+  }
+  .filters .filter-pill,
+  .filters > .select-box { width: 100%; min-width: 0; margin: 0; display: block; }
+  .filters .filter-pill select,
+  .filters > .select-box select {
     width: 100%;
     min-width: 0;
     text-overflow: ellipsis;
   }
 }
 
-/* --- 07 · sign out, arrow last -------------------------------------- */
-.nav-item.signout { justify-content: space-between; }
-.nav-item.signout > span { flex: 1; text-align: left; }
-.nav-item.signout svg { flex: 0 0 auto; }
+/* --- 07 · sign out, arrow last, phone and tablet only ----------------
+   The label leads and the arrow closes the row, so it reads as the way
+   out rather than another place to go — and the glyph is mirrored so the
+   arrow leaves towards the edge it now sits on. The laptop keeps the
+   original row: icon first, like every other item in the menu. */
+@media (max-width: 1279px) {
+  .nav-item.signout { justify-content: space-between; }
+  .nav-item.signout > span { flex: 1; text-align: left; }
+  .nav-item.signout svg { flex: 0 0 auto; transform: scaleX(-1); }
+}
 
 /* --- 08 · the back arrow sits beside the heading --------------------
    A flex container is placed alongside a float rather than under it, and
@@ -313,8 +398,11 @@ input[type="date"] { accent-color: var(--brand, #1d4ed8); }
    two on one line without touching seven page files. */
 .back-link.back-arrow {
   float: left;
-  width: 34px;
-  height: 34px;
+  /* 36px box, 18px glyph. At 34/19 the arrow was filling its own button
+     edge to edge and the round corners clipped the head of it. */
+  width: 36px;
+  height: 36px;
+  flex: 0 0 36px;
   padding: 0;
   margin: 0 8px 8px 0;
   border-radius: 9px;
@@ -322,9 +410,11 @@ input[type="date"] { accent-color: var(--brand, #1d4ed8); }
   place-items: center;
   gap: 0;
   font-size: 0;
+  line-height: 0;
+  overflow: visible;
 }
 
-.back-link.back-arrow svg { width: 19px; height: 19px; }
+.back-link.back-arrow svg { width: 18px; height: 18px; flex: 0 0 auto; }
 
 /* The heading that follows sits on the arrow's line. */
 .back-link.back-arrow + .sec-head,
@@ -337,23 +427,24 @@ input[type="date"] { accent-color: var(--brand, #1d4ed8); }
 .tl-grid, .bt-wrap, .statcards { clear: both; }
 
 /* --- 10 · the date range applies on tap ----------------------------- */
-.range-menu .range-actions { margin-top: 8px; }
-
-/* The pill is a flex item now, so the control inside it has to fill it —
-   otherwise the select keeps its content width and the chevron drawn at the
-   pill's right edge floats away from the field it belongs to. */
-
+@media (max-width: 1279px) {
+  .range-menu .range-actions { margin-top: 8px; }
+}
 
 /* Think Log has no heading block of its own — the date is its heading — so
-   the arrow joins that row rather than floating above the whole grid. */
-.tl-datehead {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  margin-bottom: 10px;
+   on a phone or tablet the arrow joins that row rather than spending a row
+   above the whole grid. The laptop still renders the labelled button above
+   the page, so this wrapper does not exist there at all. */
+@media (max-width: 1279px) {
+  .tl-datehead {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 10px;
+  }
+  .tl-datehead .tl-date { margin: 0; }
+  .tl-datehead .back-link.back-arrow { float: none; margin: 0; }
 }
-.tl-datehead .tl-date { margin: 0; }
-.tl-datehead .back-link.back-arrow { float: none; margin: 0; }
 
 /* --- 12 · the tablet gets one column ---------------------------------
    The two-column think log is a desktop shape. Between 1024 and 1280 it was

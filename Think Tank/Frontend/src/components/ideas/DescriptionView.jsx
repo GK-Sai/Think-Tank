@@ -1,4 +1,6 @@
 import FlowchartView from './FlowchartView';
+import TextZoom from './TextZoom';
+import useCompact from '../../lib/useCompact';
 import { fmtSize, extOf } from '../../lib/format';
 import { emptyDescription } from '../../data/seed';
 
@@ -17,18 +19,22 @@ import { emptyDescription } from '../../data/seed';
  * `plain` is the printing case: the flowchart at the size that fits the
  * sheet, with nothing to press.
  *
- * **Words carry no zoom control.** Bullet points and a paragraph used to sit
- * under the same − / Fit / + buttons a flowchart has. Text does not need
- * them: it reflows to whatever width it is given, and a reader who wants it
- * larger has already set that in their browser or their phone. The buttons
- * took a corner of every description to do a job that was already done.
+ * **On a phone, words carry no zoom control.** Bullet points and a paragraph
+ * sat under the same − / Fit / + buttons a flowchart has, and on a small
+ * screen those buttons take a corner of every description to do a job that is
+ * already done: text reflows to the width it is given, and a reader who wants
+ * it larger has already said so in their browser. On a laptop the control
+ * stays — there is room for it and nobody asked for it to go.
  *
- * The flowchart keeps its own, inside the drawing — that one is a picture, it
- * does not reflow, and on a phone it cannot be read without zooming.
+ * The flowchart keeps its own on every screen: that one is a picture, it does
+ * not reflow, and on a phone it cannot be read without zooming.
  */
 export default function DescriptionView({ type, content, fallbackText = '', plain = false }) {
   const c = { ...emptyDescription(), ...(content || {}) };
-  const wrap = (label, node) => node;
+  const compact = useCompact();
+  const wrap = (label, node) => (
+    plain || compact ? node : <TextZoom label={label}>{node}</TextZoom>
+  );
 
   if (type === 'flowchart') {
     return <FlowchartView value={c.flowchart} plain={plain} />;

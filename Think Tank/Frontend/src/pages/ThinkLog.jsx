@@ -6,6 +6,7 @@ import LogViewModal from '../components/thinklog/LogViewModal';
 import EditPointModal from '../components/thinklog/EditPointModal';
 import BackLink from '../components/layout/BackLink';
 import Select from '../components/ui/Select';
+import useCompact from '../lib/useCompact';
 import { useApp } from '../store/AppContext';
 import { useAuth } from '../store/AuthContext';
 import { useToast } from '../store/ToastContext';
@@ -57,6 +58,7 @@ export default function ThinkLog() {
   const { thinkLogs, addThinkLog, markLogPoint, editLogPoint } = useApp();
   const { user, isChair } = useAuth();
   const toast = useToast();
+  const compact = useCompact();
 
   const [draft, setDraft] = useState('');
   const [draftStates, setDraftStates] = useState([]);   // any of 'task', 'idea'
@@ -219,15 +221,24 @@ export default function ThinkLog() {
 
   return (
     <>
+      {/* Laptop: the labelled Back to Dashboard button on its own line above
+          the page, as it always was. */}
+      {!compact && <BackLink to="/" label="Back to Dashboard" />}
+
       <div className="tl-grid">
         {/* ---------- composer ---------- */}
         <div>
-          {/* This page's heading is the date, so the back arrow sits on that
-              line rather than on one of its own. */}
-          <div className="tl-datehead">
-            <BackLink to="/" label="Back to Dashboard" />
+          {/* Phone and tablet: this page's heading is the date, so the back
+              arrow joins that line rather than spending a row of a small
+              screen on itself. */}
+          {compact ? (
+            <div className="tl-datehead">
+              <BackLink to="/" label="Back to Dashboard" />
+              <div className="tl-date">{fmtLong(TODAY)}</div>
+            </div>
+          ) : (
             <div className="tl-date">{fmtLong(TODAY)}</div>
-          </div>
+          )}
 
           <div className="tl-card">
             <textarea
@@ -382,78 +393,171 @@ export default function ThinkLog() {
 
         {/* ---------- past logs ---------- */}
         <div className="tl-past">
-          {/* Three rows, in the order they are read: what this is and the one
-              action that resets it, then the field you search with, then the
-              two things you narrow it by. "Jump to Today" sits on the
-              heading's line because it belongs to the list as a whole, not to
-              the filters underneath. */}
-          <div className="tl-head-row">
-            <h3 className="tl-h3">
-              Think Logs
-              <span className="tl-count">
-                {filtered.length}{filtered.length !== thinkLogs.length && ` of ${thinkLogs.length}`}
-              </span>
-            </h3>
+          {compact ? (
+            /* Phone and tablet — two rows.
+               Row 1: what this is, and the one action that resets it.
+               Row 2: the field you search with, with the two things you
+               narrow it by beside it. The field used to fold away behind a
+               magnifier and the filters sat a row below it; putting all
+               three on one line gives the list of logs back the height it
+               was spending on its own controls. */
+            <>
+              <div className="tl-head-row">
+                <h3 className="tl-h3">
+                  Think Logs
+                  <span className="tl-count">
+                    {filtered.length}{filtered.length !== thinkLogs.length && ` of ${thinkLogs.length}`}
+                  </span>
+                </h3>
 
-            <button
-              type="button"
-              className="btn-add tl-jump"
-              onClick={() => {
-                setQuery('');
-                setSearchOpen(false);
-                setPeriod('all');
-                setKind('all');
-                setPage(1);
-                draftRef.current?.focus();
-                toast('Jumped to today');
-              }}
-            >
-              <CalendarIcon />
-              Jump to Today
-            </button>
-          </div>
+                <button
+                  type="button"
+                  className="btn-add tl-jump"
+                  onClick={() => {
+                    setQuery('');
+                    setSearchOpen(false);
+                    setPeriod('all');
+                    setKind('all');
+                    setPage(1);
+                    draftRef.current?.focus();
+                    toast('Jumped to today');
+                  }}
+                >
+                  <CalendarIcon />
+                  Jump to Today
+                </button>
+              </div>
 
-          {/* The field is always here now. Folding it behind an icon saved a
-              row and cost a tap on the thing this panel is for. */}
-          <div id="logSearch" className="search-wrap tl-search open">
-            <SearchIcon />
-            <input
-              ref={searchRef}
-              type="search"
-              className="soft-in"
-              placeholder="Search past logs…"
-              aria-label="Search past logs"
-              value={query}
-              onChange={(e) => setQuery(e.target.value)}
-            />
-          </div>
+              <div className="tl-searchrow">
+                <div id="logSearch" className="search-wrap tl-search open">
+                  <SearchIcon />
+                  <input
+                    ref={searchRef}
+                    type="search"
+                    className="soft-in"
+                    placeholder="Search"
+                    aria-label="Search past logs"
+                    value={query}
+                    onChange={(e) => setQuery(e.target.value)}
+                  />
+                </div>
 
-          <div className="idea-filters tl-filters">
-            <Select
-              label="Filter logs by date"
-              value={period}
-              onChange={setPeriod}
-              options={[
-                { value: 'all', label: 'Any date' },
-                { value: '0', label: 'Today' },
-                { value: '7', label: 'Last 7 days' },
-                { value: '30', label: 'Last 30 days' },
-                { value: '90', label: 'Last 3 months' },
-              ]}
-            />
+                <div className="idea-filters tl-filters">
+                  <Select
+                    label="Filter logs by date"
+                    value={period}
+                    onChange={setPeriod}
+                    options={[
+                      { value: 'all', label: 'Any date' },
+                      { value: '0', label: 'Today' },
+                      { value: '7', label: 'Last 7 days' },
+                      { value: '30', label: 'Last 30 days' },
+                      { value: '90', label: 'Last 3 months' },
+                    ]}
+                  />
 
-            <Select
-              label="Filter logs by outcome"
-              value={kind}
-              onChange={setKind}
-              options={[
-                { value: 'all', label: 'All points' },
-                { value: 'idea', label: 'Became ideas' },
-                { value: 'task', label: 'Became tasks' },
-                { value: 'open', label: 'Still open' },
-              ]}
-            />
-          </div>
+                  <Select
+                    label="Filter logs by outcome"
+                    value={kind}
+                    onChange={setKind}
+                    options={[
+                      { value: 'all', label: 'All points' },
+                      { value: 'idea', label: 'Became ideas' },
+                      { value: 'task', label: 'Became tasks' },
+                      { value: 'open', label: 'Still open' },
+                    ]}
+                  />
+                </div>
+              </div>
+            </>
+          ) : (
+            /* Laptop — exactly as it was before any of this: the Jump to
+               Today row, the heading, the open field, then the two filters. */
+            <>
+              <div className="jump-row">
+                <button
+                  type="button"
+                  className="btn-add"
+                  onClick={() => {
+                    setQuery('');
+                    setSearchOpen(false);
+                    setPeriod('all');
+                    setKind('all');
+                    setPage(1);
+                    draftRef.current?.focus();
+                    toast('Jumped to today');
+                  }}
+                >
+                  <CalendarIcon />
+                  Jump to Today
+                </button>
+
+                <button
+                  type="button"
+                  className={`jump-search${searchOpen ? ' on' : ''}`}
+                  aria-expanded={searchOpen}
+                  aria-controls="logSearch"
+                  aria-label={searchOpen ? 'Hide log search' : 'Search past logs'}
+                  title="Search past logs"
+                  onClick={() => {
+                    const next = !searchOpen;
+                    setSearchOpen(next);
+                    if (next) setTimeout(() => searchRef.current?.focus(), 0);
+                    else setQuery('');
+                  }}
+                >
+                  <SearchIcon />
+                </button>
+              </div>
+
+              <h3 className="tl-h3" style={{ marginTop: 0 }}>
+                Think Logs
+                <span className="tl-count">
+                  {filtered.length}{filtered.length !== thinkLogs.length && ` of ${thinkLogs.length}`}
+                </span>
+              </h3>
+
+              <div
+                id="logSearch"
+                className={`search-wrap tl-search${searchOpen ? ' open' : ''}`}
+                style={{ marginBottom: 8 }}
+              >
+                <SearchIcon />
+                <input
+                  ref={searchRef}
+                  type="search"
+                  className="soft-in"
+                  placeholder="Search past logs…"
+                  aria-label="Search past logs"
+                  value={query}
+                  onChange={(e) => setQuery(e.target.value)}
+                />
+              </div>
+
+              <div className="idea-filters tl-filters">
+                <div className="select-box">
+                  <select aria-label="Filter logs by date" value={period} onChange={(e) => setPeriod(e.target.value)}>
+                    <option value="all">Any date</option>
+                    <option value="0">Today</option>
+                    <option value="7">Last 7 days</option>
+                    <option value="30">Last 30 days</option>
+                    <option value="90">Last 3 months</option>
+                  </select>
+                  <ChevronDownIcon />
+                </div>
+
+                <div className="select-box">
+                  <select aria-label="Filter logs by outcome" value={kind} onChange={(e) => setKind(e.target.value)}>
+                    <option value="all">All points</option>
+                    <option value="idea">Became ideas</option>
+                    <option value="task">Became tasks</option>
+                    <option value="open">Still open</option>
+                  </select>
+                  <ChevronDownIcon />
+                </div>
+              </div>
+            </>
+          )}
 
           <div>
             {grouped.map((row, i) =>

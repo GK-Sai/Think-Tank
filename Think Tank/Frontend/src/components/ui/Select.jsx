@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { ChevronDownIcon } from '../../lib/icons';
+import useCompact from '../../lib/useCompact';
 
 /**
  * A dropdown the app draws itself.
@@ -18,9 +19,14 @@ import { ChevronDownIcon } from '../../lib/icons';
  * these screens is rare, and is the one case where opening down would put the
  * options off the bottom of the glass.
  *
- * It is a drop-in for the `<select>` it replaces: same value in, same value
- * out, and it keeps the `select-box` class so the layout rules that size these
- * controls still apply.
+ * **Only on a phone or a tablet.** On a laptop the browser's own dropdown is
+ * fine — it opens downward because there is room, it takes the page's font
+ * size, and it is the control people there already know. So above the
+ * breakpoint this renders the plain `<select>` it replaced, unchanged.
+ *
+ * It is a drop-in either way: same value in, same value out, and it keeps the
+ * `select-box` class so the layout rules that size these controls still
+ * apply.
  *
  * `options` is `[{ value, label }]`. `onChange` is handed the value itself
  * rather than an event, because there is no event to hand it.
@@ -33,6 +39,7 @@ export default function Select({
   className = '',
   id,
 }) {
+  const compact = useCompact();
   const [open, setOpen] = useState(false);
   const [drop, setDrop] = useState('down');
   const [cap, setCap] = useState(null);
@@ -113,6 +120,23 @@ export default function Select({
       if (options[active]) pick(options[active].value);
     }
   };
+
+  /* The laptop keeps the control it always had. */
+  if (!compact) {
+    return (
+      <div className={`select-box ${className}`}>
+        <select
+          id={id}
+          aria-label={label}
+          value={value}
+          onChange={(e) => onChange(e.target.value)}
+        >
+          {options.map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
+        </select>
+        <ChevronDownIcon />
+      </div>
+    );
+  }
 
   return (
     <div className={`select-box tt-select${open ? ' open' : ''} ${className}`} ref={wrapRef}>
