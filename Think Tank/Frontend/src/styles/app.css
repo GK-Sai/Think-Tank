@@ -1040,3 +1040,96 @@ a.nav-item > span:first-of-type {
   /* Clear space between the heading's line and the first card. */
   .page-head.with-range { margin-bottom: 14px; }
 }
+
+/* --- 24 · two filters to a line on a phone, at every width -----------
+   The filter rows asked the browser how many columns would fit
+   (auto-fill, minmax(150px, 1fr)). Two of those need about 308px of room,
+   so anything narrower — a 320px phone, or any phone with the page zoomed
+   in or the system font size raised — got one column and a filter on every
+   line, which is the stack that keeps coming back.
+
+   Below the phone breakpoint the count is no longer a question: it is two.
+   Ideas, Team Members, Notifications and My Tasks all share this markup, so
+   this holds for the chairman and for every team member alike. */
+@media (max-width: 640px) {
+  .idea-filters:not(.tl-filters):not(.tasks-search),
+  .filter-panel > .filters {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px;
+  }
+
+  /* The field keeps the line above them to itself. */
+  .idea-filters:not(.tl-filters):not(.tasks-search) > .search-box,
+  .filter-panel > .filters > .search-box { grid-column: 1 / -1; }
+
+  /* Nothing in a track may insist on being wider than half the screen. */
+  .idea-filters:not(.tl-filters):not(.tasks-search) > .select-box,
+  .idea-filters:not(.tl-filters):not(.tasks-search) > .select-box.wide,
+  .filter-panel > .filters > .select-box,
+  .filter-panel > .filters > .filter-pill {
+    display: block;
+    width: auto;
+    min-width: 0;
+    max-width: 100%;
+    grid-column: auto;
+    margin: 0;
+  }
+}
+
+/* Half a narrow screen is a narrow pill: the label steps down rather than
+   being cut off by the chevron. */
+@media (max-width: 400px) {
+  .idea-filters .tt-select .tt-select-btn,
+  .filter-panel .tt-select .tt-select-btn {
+    font-size: 11.5px;
+    padding: 7px 9px;
+    gap: 4px;
+  }
+  .idea-filters .tt-select .tt-select-btn svg,
+  .filter-panel .tt-select .tt-select-btn svg { width: 13px; height: 13px; }
+  .idea-filters .select-box select,
+  .filter-panel .select-box select { font-size: 11.5px; padding: 7px 24px 7px 9px; }
+}
+
+/* --- 25 · the heading gives up width, the button does not -------------
+   "Add Member" and "Create New Idea" were dropping to a line of their own
+   on a narrow or zoomed screen, because the heading beside them refused to
+   get any smaller. The heading is the flexible half of that row: it takes
+   what is left and wraps to a second line if it has to, and the button
+   stays in the corner it was asked to sit in. */
+@media (max-width: 640px) {
+  .sec-head > .sh-txt,
+  .page-head:not(.with-range) > .ph-txt {
+    flex: 1 1 0;
+    min-width: 0;
+  }
+
+  .sec-head > .sh-txt h2,
+  .page-head:not(.with-range) .page-h {
+    overflow-wrap: anywhere;
+    white-space: normal;
+  }
+
+  .sec-head .btn-add,
+  .sec-head .btn-mark,
+  .page-head:not(.with-range) .page-actions { flex: 0 0 auto; }
+
+  .sec-head .btn-add {
+    font-size: 12.5px;
+    padding: 9px 12px;
+    white-space: nowrap;
+  }
+}
+
+/* Under ~360px the label alone is wider than the room left beside the
+   heading, so the button trades its padding before its place. */
+@media (max-width: 360px) {
+  .sec-head .btn-add,
+  .page-head:not(.with-range) .page-actions .btn-solid {
+    font-size: 11.5px;
+    padding: 8px 10px;
+  }
+  .sec-head > .sh-txt h2,
+  .page-head:not(.with-range) .page-h { font-size: 18px; }
+}
