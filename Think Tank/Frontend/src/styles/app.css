@@ -1131,5 +1131,5 @@ a.nav-item > span:first-of-type {
     padding: 8px 10px;
   }
   .sec-head > .sh-txt h2,
-  .page-head:not(.with-range) .page-h { font-size: 18px; }
+  .page-head:not(.with-range) .page-h { font-size: 16px; }
 }
