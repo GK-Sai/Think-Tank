@@ -1,4 +1,3 @@
-
 /* React-only additions on top of the ported global.css.
    Everything here exists because a markup element changed type
    (nav buttons became <a>) or because a screen is new (login). */
@@ -976,4 +975,68 @@ a.nav-item > span:first-of-type {
   .sec-head .head-search.always,
   .page-head .head-search.always { order: 5; }
   .page-head .page-actions { order: 4; }
+}
+
+/* --- 22 · the page's own button sits beside its heading ---------------
+   Phone and tablet. "Create New Idea" used to be a full-width blue bar on a
+   line of its own between the heading and the search field, which pushed the
+   list of ideas a whole row further down a screen that has no rows to spare.
+   It now sits at the top right of the heading — the corner Team Members and
+   Notifications already put their button in — and the search field takes the
+   full row underneath, as its own band, clear of the filters below it.
+
+   The dashboard's date picker is excluded: .page-head.with-range is a small
+   control that already keeps the heading's line, and section 19 above sets
+   its own rules. */
+@media (max-width: 1279px) {
+  .page-head:not(.with-range) { flex-wrap: wrap; row-gap: 8px; }
+
+  .page-head:not(.with-range) .page-actions {
+    order: 4;
+    flex: 0 0 auto;
+    width: auto;
+    margin-left: auto;
+    margin-bottom: 0;
+    padding-top: 0;
+  }
+
+  /* The button is sized to its label here, not to the row it used to fill. */
+  .page-head:not(.with-range) .page-actions .btn-solid { width: auto; }
+
+  .page-head:not(.with-range) .head-search.always {
+    order: 5;
+    flex: 1 1 100%;
+    min-width: 0;
+    max-width: none;
+    margin-left: 0;
+    /* Breathing room under the search row before the filters start. */
+    margin-bottom: 8px;
+  }
+}
+
+/* A phone has less width to give: the label shrinks rather than the heading
+   wrapping to two lines beside it. */
+@media (max-width: 640px) {
+  .page-head:not(.with-range) .page-actions .btn-solid {
+    font-size: 12.5px;
+    padding: 9px 12px;
+    white-space: nowrap;
+  }
+}
+
+/* --- 23 · the dashboard's calendar button, sized for a phone ----------
+   At 42px square it hung below the heading's line and closed the gap to the
+   "Tasks Completed" card underneath it. It is an icon button; 32px is the
+   size of every other icon button on a phone (.hs-btn), and it leaves the
+   stat cards their own space. */
+@media (max-width: 640px) {
+  .page-head.with-range .range-trigger .cal {
+    width: 32px;
+    height: 32px;
+    border-radius: 9px;
+  }
+  .page-head.with-range .range-trigger .cal svg { width: 16px; height: 16px; }
+
+  /* Clear space between the heading's line and the first card. */
+  .page-head.with-range { margin-bottom: 14px; }
 }
