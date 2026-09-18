@@ -554,9 +554,19 @@ export default function FlowchartEditor({ value, onChange }) {
                  double-click here, which is why renaming never started. */
               onDoubleClick={() => { if (!mode) beginRename(shape.id); }}
             >
+              {/* Not being renamed, the label is a span — the same element,
+                  wrapping the same way, as the read-only chart draws. It used
+                  to be a read-only field here and a span there, and a field
+                  never wraps: a long name was one line on the canvas and three
+                  on the idea page, so the box grew taller than the one that
+                  had been dragged into place and the chart opened up gaps
+                  under every step. */}
+              {editingId !== shape.id ? (
+                <span className="fc-label">{shape.label}</span>
+              ) : (
               <input
                 value={shape.label}
-                readOnly={editingId !== shape.id}
+                autoFocus
                 aria-label={`Shape label: ${shape.label}`}
                 onChange={(e) => renameShape(shape.id, e.target.value)}
                 onBlur={(e) => {
@@ -577,6 +587,7 @@ export default function FlowchartEditor({ value, onChange }) {
                   }
                 }}
               />
+              )}
               <button
                 type="button"
                 className="kill"

@@ -749,15 +749,13 @@
 
   /* ================= PRINT / DOWNLOAD =================
      Sits between the description tabs and the editor on the idea form, and in
-     the action bar on the discussion page. On a phone the two buttons take the
-     full width, side by side, and the sentence above them is dropped: the
-     icons and the words on the buttons already say what they do, and the line
-     was the only thing pushing the editor below the fold. */
+     the action bar on the discussion page. Two buttons and nothing else: the
+     line that used to sit beside them said what the buttons already say, and
+     on a phone it was the only thing pushing the editor below the fold. */
   .export-bar{
     display:flex; align-items:center; gap:12px; flex-wrap:wrap;
     margin:0 0 14px;
   }
-  .export-lab{ font-size:12.5px; color:var(--text-faint); }
   .export-acts{ display:flex; gap:8px; margin-left:auto; }
   .export-acts .btn-ghost-sm{
     display:inline-flex; align-items:center; gap:7px; white-space:nowrap;
@@ -1135,7 +1133,6 @@
     }
     .select-box > svg{ right:10px; width:13px; height:13px; }
 
-    .export-lab{ display:none; }
     .export-acts{ width:100%; margin-left:0; }
     .export-acts .btn-ghost-sm{
       flex:1 1 0; justify-content:center; min-width:0;
@@ -3090,15 +3087,9 @@
     color:var(--text-muted);
   }
 
-  /* ---- zoom for words ----
-     The type grows and the lines re-wrap inside the card: the card gets
-     taller, never wider. Scaling the block as a picture would push the ends of
-     the lines off the right-hand edge and leave a phone reader dragging
-     sideways to finish a sentence. */
-  .tzoom-body{ transition:font-size .12s ease-out; }
-  .tzoom-body .desc-bullets li,
-  .tzoom-body .rev-text p{ font-size:1em; }
-  @media (prefers-reduced-motion:reduce){ .tzoom-body{ transition:none; } }
+  /* Words carry no zoom of their own any more — text reflows to the card it
+     is in, and a reader who wants it larger has said so in their browser. The
+     flowchart keeps the control above: a drawing does not reflow. */
   .fcv-links{ position:absolute; inset:0; width:100%; height:100%; pointer-events:none; }
   .fcv-node{
     position:absolute;

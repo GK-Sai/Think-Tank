@@ -12,11 +12,14 @@ import { PrinterIcon, DownloadIcon } from '../../lib/icons';
  * an idea has as much reason to take it into a meeting as the chairman who
  * wrote it.
  *
+ * The row is the two buttons and nothing else: the line of text that used to
+ * sit beside them named what the buttons already say.
+ *
  * Saving a PDF fetches its two libraries on first use, which on a slow
  * connection is a second or two of nothing happening, so the button says what
  * it is doing while it does it.
  */
-export default function ExportBar({ targetRef, name, label = 'this description' }) {
+export default function ExportBar({ targetRef, name }) {
   const toast = useToast();
   const [busy, setBusy] = useState(null);   // 'print' | 'pdf'
 
@@ -34,7 +37,6 @@ export default function ExportBar({ targetRef, name, label = 'this description' 
 
   return (
     <div className="export-bar">
-      <span className="export-lab">Take {label} with you</span>
       <div className="export-acts">
         <button
           type="button"

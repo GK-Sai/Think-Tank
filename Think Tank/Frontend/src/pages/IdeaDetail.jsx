@@ -65,11 +65,7 @@ function Version({ idea, revision, index, total, isLatest, footer }) {
             </span>
           )}
         </h2>
-        <ExportBar
-          targetRef={printRef}
-          name={fileName}
-          label={stamp ? `version ${versionNo}` : 'this idea'}
-        />
+        <ExportBar targetRef={printRef} name={fileName} />
       </div>
 
       {revision.descriptionType ? (

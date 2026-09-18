@@ -86,12 +86,11 @@ export default function Ideas() {
 
   return (
     <>
-      {/* Laptop: the labelled button on its own line above the page. Phone
-          and tablet: the arrow goes inside the heading block — see PageHead. */}
-      {!compact && <BackLink to="/" label="Back to Dashboard" />}
-
+      {/* The arrow is the first thing on the heading's own row, on every
+          screen — see BackLink. */}
       <PageHead
-        back={compact ? <BackLink to="/" label="Back to Dashboard" /> : null}
+        className="ideas-head"
+        back={<BackLink to="/" label="Back to Dashboard" />}
         title="Ideas"
         /* The line under the heading is gone on every one of these five
            pages: on a phone it was pushing the list itself below the fold,

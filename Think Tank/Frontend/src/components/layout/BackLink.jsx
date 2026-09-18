@@ -1,6 +1,5 @@
 import { useNavigate } from 'react-router-dom';
 import { ArrowLeftIcon } from '../../lib/icons';
-import useCompact from '../../lib/useCompact';
 
 /**
  * The back control every page above the dashboard carries.
@@ -10,30 +9,29 @@ import useCompact from '../../lib/useCompact';
  * — an idea, a filtered list, the same page again after a reload — which is
  * not what the words on the button promise.
  *
- * **On a phone or tablet it is an arrow.** "← Back to Dashboard" took a whole
- * row of a phone screen to say what an arrow says on its own, and pushed the
- * heading — the thing that tells you where you are — below the fold. The arrow
- * sits beside the heading instead, so the place you are and the way back are
- * read together on one line. The label is still the button's accessible name
- * and its tooltip, so a screen reader hears "Back to Dashboard", not "button".
+ * **It is an arrow, on every screen.** The words used to be spelled out on a
+ * laptop and folded to an arrow on a phone. They said nothing the arrow does
+ * not — an arrow at the top left of a page is the way back, everywhere — and
+ * spending a whole row above the heading to say it pushed the page itself
+ * down. The arrow now sits on the heading's own line, immediately before the
+ * title, so where you are and the way back are read together: ← Ideas.
  *
- * **On a laptop it is the labelled button it always was.** There is room for
- * the words there, and the page was not asking for the change.
+ * The label lives on as the button's accessible name and its tooltip, so a
+ * screen reader still hears "Back to Dashboard" rather than "button", and
+ * hovering still says where the arrow goes.
  */
 export default function BackLink({ to = '/', label = 'Back', className = '' }) {
   const navigate = useNavigate();
-  const compact = useCompact();
 
   return (
     <button
       type="button"
-      className={`back-link${compact ? ' back-arrow' : ''}${className ? ` ${className}` : ''}`}
+      className={`back-link back-arrow${className ? ` ${className}` : ''}`}
       onClick={() => navigate(to)}
       title={label}
-      aria-label={compact ? label : undefined}
+      aria-label={label}
     >
       <ArrowLeftIcon />
-      {!compact && label}
     </button>
   );
 }

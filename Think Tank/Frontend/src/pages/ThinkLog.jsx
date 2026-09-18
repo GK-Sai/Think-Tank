@@ -221,24 +221,15 @@ export default function ThinkLog() {
 
   return (
     <>
-      {/* Laptop: the labelled Back to Dashboard button on its own line above
-          the page, as it always was. */}
-      {!compact && <BackLink to="/" label="Back to Dashboard" />}
-
       <div className="tl-grid">
         {/* ---------- composer ---------- */}
         <div>
-          {/* Phone and tablet: this page's heading is the date, so the back
-              arrow joins that line rather than spending a row of a small
-              screen on itself. */}
-          {compact ? (
-            <div className="tl-datehead">
-              <BackLink to="/" label="Back to Dashboard" />
-              <div className="tl-date">{fmtLong(TODAY)}</div>
-            </div>
-          ) : (
+          {/* This page's heading is the date, so the arrow joins that line
+              rather than spending a row of its own above the whole grid. */}
+          <div className="tl-datehead">
+            <BackLink to="/" label="Back to Dashboard" />
             <div className="tl-date">{fmtLong(TODAY)}</div>
-          )}
+          </div>
 
           <div className="tl-card">
             <textarea

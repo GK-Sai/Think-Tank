@@ -169,15 +169,16 @@ export default function IdeaForm() {
   return (
     <>
       <PageHead
+        back={(
+          <BackLink
+            to={existing ? `/ideas/${id}` : '/ideas'}
+            label={existing ? 'Back to the idea' : 'Back to Ideas'}
+          />
+        )}
         title={existing ? 'Edit Idea' : 'Create New Idea'}
         subtitle={existing
           ? `Editing “${existing.title}”`
           : 'Describe the idea, then fill in the details below'}
-      />
-
-      <BackLink
-        to={existing ? `/ideas/${id}` : '/ideas'}
-        label={existing ? 'Back to the idea' : 'Back to Ideas'}
       />
 
       <form className="card" onSubmit={submit} noValidate>
@@ -211,7 +212,6 @@ export default function IdeaForm() {
             <ExportBar
               targetRef={printRef}
               name={draft.tagline?.trim() || existing?.title || 'idea'}
-              label="this description"
             />
           )}
 

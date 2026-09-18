@@ -72,10 +72,8 @@ export default function Team() {
 
   return (
     <>
-      {!compact && <BackLink to="/" label="Back to Dashboard" />}
-
       <div className={`sec-head${!compact && searchOpen ? ' searching' : ''}`}>
-        {compact && <BackLink to="/" label="Back to Dashboard" />}
+        <BackLink to="/" label="Back to Dashboard" />
         <div className="sh-txt">
           <h2>Team Members</h2>
         </div>

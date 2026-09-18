@@ -1133,3 +1133,115 @@ a.nav-item > span:first-of-type {
   .sec-head > .sh-txt h2,
   .page-head:not(.with-range) .page-h { font-size: 16px; }
 }
+/* =====================================================================
+   September 2026 — third pass
+   ---------------------------------------------------------------------
+     22 · the arrow is the back control, on every screen
+     23 · room under Create New Idea
+     24 · the flowchart is read in the box it was drawn in
+   ===================================================================== */
+
+/* --- 22 · one arrow, one line ---------------------------------------
+   "Back to Dashboard" and "Back to Ideas" are gone from the page: the
+   words said nothing the arrow does not, and on a laptop they spent a
+   whole row above the heading saying it. Every page now hands its arrow
+   into its own heading block, so the rules that used to apply to a phone
+   apply everywhere — these are the few that were still shut inside a
+   media query. */
+.sec-head,
+.page-head { align-items: center; }
+
+.sec-head > .back-link.back-arrow,
+.page-head > .back-link.back-arrow { align-self: center; }
+
+/* Think Log's heading is its date, and the idea page's is its action bar;
+   both hold the arrow inline rather than floated. */
+.tl-datehead {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+.tl-datehead .tl-date { margin: 0; }
+.tl-datehead .back-link.back-arrow,
+.detail-bar .back-link.back-arrow { float: none; margin: 0; }
+
+/* The heading takes what is left of the row and gives it up first — it was
+   a phone rule, and it is what keeps a long title from pushing the search
+   field or the button off the row on a laptop too. */
+.sec-head > .sh-txt,
+.page-head > .ph-txt { flex: 1 1 120px; min-width: 0; }
+
+/* Nothing is floated beside the heading any more, so the blocks that had to
+   clear the float can simply follow it. */
+.tl-grid, .bt-wrap, .statcards { clear: none; }
+
+/* --- 23 · room under Create New Idea ---------------------------------
+   The create box sat straight on top of the filter row. The gap belongs
+   under the button rather than on the row below it, so the pages without a
+   button are not moved by it. */
+.page-head.ideas-head { margin-bottom: 10px; }
+.page-head.ideas-head .page-actions { margin-bottom: 14px; }
+
+@media (max-width: 640px) {
+  /* On a phone the button is on the heading's row and the whole block is
+     tighter, so the gap is worth a little more. */
+  .page-head.ideas-head .page-actions { margin-bottom: 18px; }
+}
+
+/* --- 24 · the flowchart, read in the box it was drawn in --------------
+   A shape is placed by its top-left corner, so if the box is not the size
+   it was when it was dragged there, everything around it is wrong: the
+   read-only chart drew its boxes 200px wide at 12.5px type and let a long
+   name wrap onto a second and third line, while the editor drew the same
+   shape 190px wide at 13px on one line. The taller box opened a gap under
+   every step and left the arrows meeting the wrong edges.
+
+   One set of numbers for both, written here so the two cannot drift apart
+   again. The label is now rendered the same way in both as well — see
+   FlowchartEditor — so a name wraps to the same lines on the canvas and on
+   the idea page. */
+.fc-node,
+.fcv-node {
+  box-sizing: border-box;
+  min-width: 118px;
+  max-width: 190px;
+  padding: 12px 14px;
+  border-width: 2px;
+  border-radius: 10px;
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1.35;
+  text-align: center;
+}
+.fc-node.terminator,
+.fcv-node.terminator { border-radius: 999px; }
+
+/* The label: a span in the read-only chart and, until it is being renamed,
+   a span in the editor too. Both wrap the same way, so both boxes are the
+   same height. */
+.fc-node .fc-label,
+.fcv-node > span {
+  display: block;
+  width: 100%;
+  overflow-wrap: anywhere;
+}
+
+/* On the canvas the label is part of the shape rather than text: it can be
+   grabbed to drag from, a drag across it selects nothing, and a finger on it
+   is not handed to the browser to scroll the page with — that last one used
+   to cancel a drag part-way and leave the shape stranded. */
+.fc-node .fc-label {
+  user-select: none;
+  cursor: inherit;
+  touch-action: none;
+}
+
+/* While a name is being typed it is one line in a field, which is how a
+   field behaves — the box it sits in keeps the height the finished label
+   will have, so nothing jumps when the rename ends. */
+.fc-node input {
+  display: block;
+  width: 100%;
+  line-height: 1.35;
+}
