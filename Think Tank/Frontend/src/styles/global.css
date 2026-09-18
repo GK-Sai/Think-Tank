@@ -2847,6 +2847,12 @@
     color:var(--text-dark);
     /* Two lines of the headline, then an ellipsis — a banner, not a letter. */
     display:-webkit-box;
+    -webkit-line-clamp:2;
+    /* The standard spelling beside the prefixed one. Every browser in use
+       still reads the -webkit- pair, so this changes nothing on screen — it
+       is what the editor asks for, and what will keep the clamp working when
+       the prefix is finally dropped. Replacing the prefixed line with this
+       one, rather than adding to it, switches the clamp off in Chrome. */
     line-clamp:2;
     -webkit-box-orient:vertical;
     overflow:hidden;
